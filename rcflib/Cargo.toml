@@ -1,0 +1,28 @@
+[package]
+name = "rcf"
+version = "4.0.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[profile.test]
+opt-level = 3
+
+[lib]
+name = "rcflib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "example"
+path = "src/example.rs"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+
+[dependencies]
+num = "*"
+rayon = "*"
+rand = "*"
+rand_chacha = "*"
+rand_core = "*"
+
+[dev-dependencies]
+parameterized_test = "*"

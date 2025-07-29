@@ -9,4 +9,11 @@ name = "krcf"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = "*"
+pyo3 = { version = "*", features = ["extension-module", "generate-import-lib"] }
+rcf = { path = "./rcflib" }
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true
+split-debuginfo = "packed"

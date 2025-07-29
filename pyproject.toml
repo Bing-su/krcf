@@ -1,5 +1,8 @@
 [project]
 name = "krcf"
+authors = [{ name = "Dowon", email = "ks2515@naver.com" }]
+description = "AWS Random Cut Forest for Python"
+license = "Apache-2.0"
 requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Rust",
@@ -19,7 +22,7 @@ build-backend = "maturin"
 
 [tool.maturin]
 python-source = "python"
-features = ["pyo3/extension-module"]
+profile = "release"
 
 [tool.ruff.lint]
 select = [
