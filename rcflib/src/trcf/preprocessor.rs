@@ -2,7 +2,6 @@ use crate::common::descriptor::{AnomalyInformation, Descriptor};
 use crate::common::deviation::Deviation;
 use crate::common::rangevector::RangeVector;
 use crate::rcf::{AugmentedRCF, RCF};
-use crate::trcf::basictrcf::BasicTRCFBuilder;
 use crate::trcf::transformer::WeightedTransformer;
 use crate::trcf::types::ForestMode::{STANDARD, STREAMING_IMPUTE, TIME_AUGMENTED};
 use crate::trcf::types::ImputationMethod::USE_RCF;
@@ -10,10 +9,6 @@ use crate::trcf::types::TransformMethod::{NORMALIZE, NORMALIZE_DIFFERENCE};
 use crate::trcf::types::{ForestMode, ImputationMethod, TransformMethod};
 use crate::types::Result;
 use crate::util::check_argument;
-use rand::Rng;
-use rand_chacha::ChaCha20Rng;
-use rand_core::SeedableRng;
-use std::cmp::min;
 
 const DEFAULT_START_NORMALIZATION: usize = 10;
 

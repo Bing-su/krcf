@@ -110,7 +110,7 @@ impl Visitor<MediumNodeView, (f64, usize, f64)> for ImputeVisitor {
             converged,
             score,
             index: node_view.leaf_index(),
-            random: self.rng.gen::<f32>(),
+            random: self.rng.random::<f32>(),
             distance: dist,
         });
         Ok(())

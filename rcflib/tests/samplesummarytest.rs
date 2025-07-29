@@ -83,15 +83,15 @@ sample_summary_distance_test! {
 #[test]
 fn benchmark() {
     let mut generator = ThreadRng::default();
-    let one_seed: u64 = generator.gen();
-    println!(" single seed is {}", one_seed);
+    let one_seed: u64 = generator.random();
+    println!(" single seed is {one_seed}");
     let mut rng = ChaCha20Rng::seed_from_u64(one_seed);
 
     let mut error = 0;
     for _ in 0..10 {
         let seed = rng.next_u64();
-        let d = rng.gen_range(3..23);
-        error += (core(200000, d, seed, l1distance) == false) as i32;
+        let d = rng.random_range(3..23);
+        error += (!core(200000, d, seed, l1distance)) as i32;
     }
     assert!(error < 5);
 }

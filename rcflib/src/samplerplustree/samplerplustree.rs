@@ -8,11 +8,9 @@ use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use rand_core::RngCore;
 
-use crate::samplerplustree::nodestore::NodeStore;
 use crate::{
     pointstore::PointStore,
     samplerplustree::{
-        nodestore::VectorNodeStore,
         nodeview::UpdatableNodeView,
         randomcuttree::{RCFTree, Traversable},
         sampler::Sampler,
@@ -101,11 +99,11 @@ where
             let mut initial = false;
             let mut rng = ChaCha20Rng::seed_from_u64(self.random_seed);
             self.random_seed = rng.next_u64();
-            let random_number: f64 = rng.gen();
+            let random_number: f64 = rng.random();
             let weight: f64 =
                 f64::ln(-f64::ln(random_number)) - ((self.entries_seen as f64) * self.time_decay);
             if !self.sampler.is_full() {
-                let other_random: f64 = rng.gen();
+                let other_random: f64 = rng.random();
                 let fill_fraction: f64 = self.sampler.get_fill_fraction();
                 initial = other_random < self.initial_accept_probability(fill_fraction);
             }

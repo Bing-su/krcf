@@ -5,7 +5,7 @@ extern crate rcflib;
 use num::abs;
 use rcflib::rcf::{RCFBuilder, RCFOptionsBuilder};
 use rcflib::{
-    common::multidimdatawithkey::MultiDimDataWithKey, rcf::RCF, visitor::visitor::VisitorInfo,
+    common::multidimdatawithkey::MultiDimDataWithKey, visitor::visitor::VisitorInfo,
 };
 
 /// try cargo test --release
@@ -23,7 +23,7 @@ fn two_distribution_test_static() {
     let scale = vec![vec![0.1f32; dimensions], vec![0.1f32; dimensions]];
     let mean = vec![vec1.clone(), vec2.clone()].clone();
     let data_with_key =
-        MultiDimDataWithKey::mixture(data_size, &mean, &scale, &vec![0.5f32, 0.5f32], 0).unwrap();
+        MultiDimDataWithKey::mixture(data_size, &mean, &scale, &[0.5f32, 0.5f32], 0).unwrap();
 
     let shingle_size = 1;
     let number_of_trees = 50;

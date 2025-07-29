@@ -61,7 +61,8 @@ fn basic_trcf(transform_method: TransformMethod) {
     let mut rng = ChaCha20Rng::seed_from_u64(42);
     let mut amplitude = Vec::new();
     for _i in 0..base_dimension {
-        amplitude.push((1.0 + 0.2 * rng.gen::<f32>()) * 60.0);
+        let val: f32 = rng.random();
+        amplitude.push((1.0 + 0.2 * val) * 60.0);
     }
 
     let data_with_key = multidimdatawithkey::MultiDimDataWithKey::multi_cosine(
@@ -70,13 +71,13 @@ fn basic_trcf(transform_method: TransformMethod) {
         &amplitude,
         noise,
         42,
-        base_dimension.into(),
+        base_dimension,
     )
     .unwrap();
 
     let mut next_index = 0;
 
-    println!("{}", transform_method);
+    println!("{transform_method}");
     for i in 0..data_with_key.data.len() {
         if next_index < data_with_key.change_indices.len()
             && data_with_key.change_indices[next_index] == i
@@ -93,13 +94,13 @@ fn basic_trcf(transform_method: TransformMethod) {
         }
         let result = trcf.process(&data_with_key.data[i], i as u64).unwrap();
         if result.anomaly_grade > 0.0 {
-            print!("timestamp {} ", i);
+            print!("timestamp {i} ");
             let gap = -result.last_anomaly.as_ref().unwrap().relative_index;
             if gap != 0 {
                 if gap == 1 {
                     print!("1 step ago, ");
                 } else {
-                    print!("{} steps ago, ", gap);
+                    print!("{gap} steps ago, ");
                 }
             }
 
@@ -174,8 +175,7 @@ fn trcf_scale(
     let noise = 5.0;
 
     println!(
-        "At scale {}, add spikes? {} verbose = {} ",
-        transform_method, add_spikes, verbose
+        "At scale {transform_method}, add spikes? {add_spikes} verbose = {verbose} "
     );
     let mut trcf: BasicTRCF = BasicTRCFBuilder::new(base_dimension, shingle_size)
         .tree_capacity(capacity)
@@ -192,28 +192,29 @@ fn trcf_scale(
         .build()
         .unwrap();
 
-    let mut rng = ChaCha20Rng::from_entropy();
+    let mut rng = ChaCha20Rng::from_os_rng();
     let mut amplitude = Vec::new();
     for _i in 0..base_dimension {
-        amplitude.push((1.0 + 0.2 * rng.gen::<f32>()) * 60.0);
+        let val: f32 = rng.random();
+        amplitude.push((1.0 + 0.2 * val) * 60.0);
     }
     let mut data_with_key = multidimdatawithkey::MultiDimDataWithKey::multi_cosine(
         data_size,
         &vec![60; base_dimension],
         &amplitude,
         noise,
-        rng.gen::<u64>(),
-        base_dimension.into(),
+        rng.random::<u64>(),
+        base_dimension,
     )
     .unwrap();
 
     let mut potential_anomalies: Vec<usize> = Vec::new();
 
-    let mut next = 100 + (rng.gen::<f32>() * 100.0) as usize;
+    let mut next = 100 + (rng.random::<f32>() * 100.0) as usize;
     for i in 0..data_with_key.data.len() {
         if add_spikes && i == next {
-            data_with_key.data[i][0] += 100.0 * (1.0 + 0.05 * rng.gen::<f32>());
-            next = 100 + (rng.gen::<f32>() * 100.0) as usize;
+            data_with_key.data[i][0] += 100.0 * (1.0 + 0.05 * rng.random::<f32>());
+            next = 100 + (rng.random::<f32>() * 100.0) as usize;
         }
 
         let result = trcf.process(&data_with_key.data[i], 0).unwrap();

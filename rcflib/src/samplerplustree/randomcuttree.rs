@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
 
@@ -13,7 +12,7 @@ use crate::{
     samplerplustree::{
         boundingbox::BoundingBox,
         cut::Cut,
-        nodestore::{BasicStore, BoxStore, NodeStore, VectorNodeStore},
+        nodestore::{BasicStore, BoxStore, VectorNodeStore},
         nodeview::{MediumNodeView, UpdatableMultiNodeView, UpdatableNodeView},
     },
     types::{Location, Result},
@@ -155,7 +154,7 @@ where
                 let mut saved_cut = Cut::new(usize::MAX, 0.0);
                 /* the loop has the execute once */
                 loop {
-                    let factor: f64 = rng.gen();
+                    let factor: f64 = rng.random();
                     let (new_cut, separation) =
                         Cut::random_cut_and_separation(&current_box, factor, point);
                     if separation {

@@ -2,19 +2,15 @@ use crate::common::descriptor::Descriptor;
 use crate::common::rangevector::RangeVector;
 use crate::rcf::RCFOptionsBuilder;
 use crate::rcf::{RCFBuilder, RCFOptions, RCF};
-use crate::trcf::basictrcf::{core_process, BasicTRCF, State, TRCFOptions, TRCFOptionsBuilder};
+use crate::trcf::basictrcf::{core_process, State, TRCFOptions, TRCFOptionsBuilder};
 use crate::trcf::errorhandler::ErrorHandler;
 use crate::trcf::predictorcorrector::PredictorCorrector;
-use crate::trcf::preprocessor::{Preprocessor, PreprocessorBuilder};
-use crate::trcf::types::Calibration::{MINIMAL, NONE};
-use crate::trcf::types::ForestMode::{STANDARD, STREAMING_IMPUTE, TIME_AUGMENTED};
-use crate::trcf::types::TransformMethod::NORMALIZE;
-use crate::trcf::types::{Calibration, ForestMode, TransformMethod};
+use crate::trcf::preprocessor::PreprocessorBuilder;
+use crate::trcf::types::Calibration::MINIMAL;
+use crate::trcf::types::ForestMode::STREAMING_IMPUTE;
+use crate::trcf::types::Calibration;
 use crate::types::Result;
 use crate::util::check_argument;
-use rand::Rng;
-use rand_chacha::ChaCha20Rng;
-use rand_core::SeedableRng;
 
 pub const DEFAULT_ERROR_PERCENTILE: f32 = 0.1;
 

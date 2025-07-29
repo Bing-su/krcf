@@ -3,17 +3,15 @@ extern crate rand;
 extern crate rand_chacha;
 
 use core::fmt::Debug;
-use std::collections::HashMap;
 use std::hash::Hash;
 
-use rand::{Rng, SeedableRng};
+use rand::SeedableRng;
 use rand_chacha::ChaCha20Rng;
 use rand_core::RngCore;
 use rayon::prelude::*;
 
 use crate::common::rangevector::RangeVector;
 use crate::errors::RCFError;
-use crate::errors::RCFError::InvalidArgument;
 use crate::{
     common::{
         conditionalfieldsummarizer::FieldSummarizer, directionaldensity::InterpolationMeasure,

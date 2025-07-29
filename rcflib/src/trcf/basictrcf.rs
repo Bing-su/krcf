@@ -6,16 +6,14 @@ use crate::rcf::{AugmentedRCF, RCFBuilder, RCFOptions, RCF};
 use crate::trcf::predictorcorrector::PredictorCorrector;
 use crate::trcf::preprocessor::{Preprocessor, PreprocessorBuilder};
 use crate::trcf::types::ForestMode::{STANDARD, STREAMING_IMPUTE, TIME_AUGMENTED};
-use crate::trcf::types::ImputationMethod::USE_RCF;
-use crate::trcf::types::ScoringStrategy::{DISTANCE, EXPECTED_INVERSE_HEIGHT};
-use crate::trcf::types::TransformMethod::{NONE, NORMALIZE};
-use crate::trcf::types::{ForestMode, ImputationMethod, ScoringStrategy, TransformMethod};
+use crate::trcf::types::ScoringStrategy::EXPECTED_INVERSE_HEIGHT;
+use crate::trcf::types::TransformMethod::NORMALIZE;
+use crate::trcf::types::{ForestMode, ScoringStrategy, TransformMethod};
 use crate::types::Result;
 use crate::util::check_argument;
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
 use rand_core::SeedableRng;
-use std::hash::Hash;
 
 #[repr(C)]
 #[derive(Clone)]
@@ -137,8 +135,8 @@ impl State {
 
     pub fn random(&mut self) -> f32 {
         let mut rng = ChaCha20Rng::seed_from_u64(self.random_seed);
-        self.random_seed = rng.gen::<u64>();
-        rng.gen::<f32>()
+        self.random_seed = rng.random::<u64>();
+        rng.random::<f32>()
     }
 }
 

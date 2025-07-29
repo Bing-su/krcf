@@ -17,7 +17,7 @@ fn rotate_clockwise(point: &[f32], theta: f32) -> Vec<f32> {
     let mut result = vec![0.0f32; 2];
     result[0] = theta.cos() * point[0] + theta.sin() * point[1];
     result[1] = -theta.sin() * point[0] + theta.cos() * point[1];
-    return result;
+    result
 }
 
 fn gen_numeric_data(
@@ -33,7 +33,7 @@ fn gen_numeric_data(
     let mut rng = ChaCha20Rng::seed_from_u64(seed);
     for i in 0..data_size {
         let vec = new_vec(&vec_mean, &scale, &mut rng);
-        if rng.gen::<f64>() < 0.005 {
+        if rng.random::<f64>() < 0.005 {
             let j: usize = (rng.next_u32() as usize) % number_of_fans;
             data.push(rotate_clockwise(
                 &vec,
@@ -72,8 +72,8 @@ fn numeric_glad() {
     let data_size = 1000000; // should be sufficiently large for covering a 360 degree rotation, for |capacity| points
     let number_of_fans = 3;
     let mut generator = ThreadRng::default();
-    let one_seed: u64 = generator.gen();
-    println!(" single seed is {}", one_seed);
+    let one_seed: u64 = generator.random();
+    println!(" single seed is {one_seed}");
     let capacity = 2000;
     let time_decay = 1.0 / capacity as f64;
     let data_with_key = gen_numeric_data(
@@ -108,10 +108,8 @@ fn numeric_glad() {
             } else {
                 true_pos += 1;
             }
-        } else {
-            if data_with_key.labels[j] >= number_of_fans {
-                false_neg += 1;
-            }
+        } else if data_with_key.labels[j] >= number_of_fans {
+            false_neg += 1;
         }
 
         if (j * 360 / data_size) % 2 != 0 {
@@ -120,17 +118,15 @@ fn numeric_glad() {
                 println!();
             }
             first = true;
-        } else {
-            if print_clusters && first {
-                let a = glad.clusters();
-                for i in 0..a.len() {
-                    let item = &a[i];
-                    for rep in item.representatives() {
-                        println!("{} {} {} {}", rep.0[0], rep.0[1], i, rep.1);
-                    }
+        } else if print_clusters && first {
+            let a = glad.clusters();
+            for i in 0..a.len() {
+                let item = &a[i];
+                for rep in item.representatives() {
+                    println!("{} {} {} {}", rep.0[0], rep.0[1], i, rep.1);
                 }
-                first = false;
             }
+            first = false;
         }
     }
     println!(
@@ -202,7 +198,7 @@ pub fn get_ab_array(
         } else {
             probability_of_a
         };
-        if rng.gen::<f64>() < toss {
+        if rng.random::<f64>() < toss {
             answer.push('\u{2014}');
         } else {
             answer.push('\u{005F}');
@@ -247,8 +243,8 @@ fn print_clusters(clusters: &Vec<MultiCenter<Vec<char>>>) {
 fn string_glad() {
     let data_size = 200000; // should be sufficiently large for covering a 360 degree rotation, for |capacity| points
     let mut generator = ThreadRng::default();
-    let one_seed: u64 = generator.gen();
-    println!(" single seed is {}", one_seed);
+    let one_seed: u64 = generator.random();
+    println!(" single seed is {one_seed}");
     let mut rng = ChaCha20Rng::seed_from_u64(one_seed);
     let string_size = 70;
     let capacity = 2000;
@@ -273,19 +269,19 @@ fn string_glad() {
 
     for i in 0..data_size {
         if i > 0 && i % 10000 == 0 {
-            println!(" at {} ", i);
+            println!(" at {i} ");
             if print_clusters_strings {
                 print_clusters(&glad.clusters());
             }
         }
         let mut point = Vec::new();
-        if rng.gen::<f64>() < anomaly_rate {
+        if rng.random::<f64>() < anomaly_rate {
             injected = true;
             number_of_injected += 1;
             point = get_ab_array(string_size + 10, 0.5, &mut rng, false, 0.0);
         } else {
-            let flag = change_in_middle && rng.gen::<f64>() < 0.25;
-            let prob = if rng.gen::<f64>() < 0.5 {
+            let flag = change_in_middle && rng.random::<f64>() < 0.25;
+            let prob = if rng.random::<f64>() < 0.5 {
                 gap_prob_of_a
             } else {
                 1.0 - gap_prob_of_a
@@ -306,13 +302,11 @@ fn string_glad() {
             } else {
                 true_pos += 1;
             }
-        } else {
-            if injected && i > capacity / 2 {
-                false_neg += 1;
-            }
+        } else if injected && i > capacity / 2 {
+            false_neg += 1;
         }
     }
-    println!("injected {}", number_of_injected);
+    println!("injected {number_of_injected}");
     println!(
         " precision {} recall {} out of {} injected anomalies",
         (true_pos as f32) / (true_pos + false_pos) as f32,

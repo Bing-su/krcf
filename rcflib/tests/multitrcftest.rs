@@ -68,9 +68,9 @@ pub fn multi_trcf(transform_method: TransformMethod, parallel_enabled: bool) {
         let mut amplitude = Vec::new();
         let mut period = Vec::new();
         for _i in 0..input_dimensions {
-            amplitude.push((1.0 + 0.2 * rng.gen::<f32>()) * 60.0);
+            amplitude.push((1.0 + 0.2 * rng.random::<f32>()) * 60.0);
             // ranges from [30,90)
-            period.push(30 + ((rng.gen::<f32>()) * 60.0) as usize);
+            period.push(30 + ((rng.random::<f32>()) * 60.0) as usize);
         }
 
         period_map.insert(y as u64, period.clone());
@@ -81,8 +81,8 @@ pub fn multi_trcf(transform_method: TransformMethod, parallel_enabled: bool) {
                 &period,
                 &amplitude,
                 noise,
-                rng.gen::<u64>(),
-                input_dimensions.into(),
+                rng.random::<u64>(),
+                input_dimensions,
             )
             .unwrap(),
         );
@@ -136,12 +136,10 @@ pub fn multi_trcf(transform_method: TransformMethod, parallel_enabled: bool) {
         late_discovered[i % shingle_size] = injected;
     }
     println!(
-        "number of time series: {} size {} each, {} arms,  parallel enabled: {}",
-        number_of_series, data_size, number_of_models, parallel_enabled
+        "number of time series: {number_of_series} size {data_size} each, {number_of_models} arms,  parallel enabled: {parallel_enabled}"
     );
     println!(
-        "shingle size: {}, normalization: {}, anomalies in total {}",
-        shingle_size, transform_method, total_injected
+        "shingle size: {shingle_size}, normalization: {transform_method}, anomalies in total {total_injected}"
     );
     println!(
         "spot precision {} recall {}",

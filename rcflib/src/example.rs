@@ -3,8 +3,8 @@ extern crate rand_chacha;
 extern crate rcflib;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
+use rcflib::common::multidimdatawithkey;
 use rcflib::rcf::{RCFBuilder, RCFOptionsBuilder};
-use rcflib::{common::multidimdatawithkey, rcf::RCF};
 
 fn main() {
     let shingle_size = 8;
@@ -40,7 +40,7 @@ fn main() {
     let mut rng = ChaCha20Rng::seed_from_u64(42);
     let mut amplitude = Vec::new();
     for _i in 0..base_dimension {
-        amplitude.push((1.0 + 0.2 * rng.gen::<f32>()) * 60.0);
+        amplitude.push((1.0 + 0.2 * rng.random::<f32>()) * 60.0);
     }
 
     let data_with_key = multidimdatawithkey::MultiDimDataWithKey::multi_cosine(
@@ -49,7 +49,7 @@ fn main() {
         &amplitude,
         noise,
         0,
-        base_dimension.into(),
+        base_dimension,
     )
     .unwrap();
 

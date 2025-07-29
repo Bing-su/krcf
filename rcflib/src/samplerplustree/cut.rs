@@ -97,7 +97,7 @@ impl Cut {
         };
 
         let mut rng = ChaCha20Rng::seed_from_u64(17); //ChaCha20Rng::from_entropy();
-        let index = if rng.gen::<f32>() < 0.5 {
+        let index = if rng.random::<f32>() < 0.5 {
             first_gap
         } else {
             last_gap

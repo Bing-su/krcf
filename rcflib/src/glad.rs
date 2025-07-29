@@ -155,10 +155,10 @@ impl<T: Clone + Sync> GlobalLocalAnomalyDetector<T> {
         let mut initial = false;
         let mut rng = ChaCha20Rng::seed_from_u64(self.random_seed);
         self.random_seed = rng.next_u64();
-        let random_number: f64 = rng.gen();
+        let random_number: f64 = rng.random();
         let heap_weight = self.compute_weight(random_number, weight);
         if self.current_size < self.capacity {
-            let other_random: f64 = rng.gen();
+            let other_random: f64 = rng.random();
             initial = other_random < self.initial_accept_probability(self.fill_fraction());
         }
         if initial || (heap_weight < self.heap[0].0) {
@@ -316,7 +316,7 @@ impl<T: Clone + Sync> GlobalLocalAnomalyDetector<T> {
                         }
                     })
                     .sum();
-                for mut item in &mut score_list {
+                for item in &mut score_list {
                     let t = if item.1 == f32::MAX {
                         0.0
                     } else {
@@ -326,7 +326,7 @@ impl<T: Clone + Sync> GlobalLocalAnomalyDetector<T> {
                 }
             } else {
                 let y = score_list.len();
-                for mut item in &mut score_list {
+                for item in &mut score_list {
                     item.1 = 1.0 / (y as f32);
                 }
             }

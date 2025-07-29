@@ -1,10 +1,8 @@
 extern crate num;
-use crate::errors::RCFError;
 use crate::types::Result;
 use crate::util::check_argument;
 use crate::{common::intervalstoremanager::IntervalStoreManager, types::Location};
 use std::hash::Hash;
-use std::ptr::hash;
 use std::{collections::HashMap, convert::TryFrom, fmt::Debug};
 
 pub const MAX_ATTRIBUTES: usize = 10;
@@ -344,7 +342,7 @@ where
             check_argument(point.len() == self.dimensions, "incorrect lengths")?;
         }
 
-        let mut attrib_vec = None;
+        let attrib_vec = None;
         let attrib_pos = if self.store_attributes {
             let new_attribute = (self.attribute_creator)(&self.label_shingle, label)?;
             let a_pos = *self

@@ -1,7 +1,7 @@
 use crate::common::descriptor::Descriptor;
 use crate::common::deviation::Deviation;
 use crate::common::divector::DiVector;
-use crate::rcf::{AugmentedRCF, RCF};
+use crate::rcf::AugmentedRCF;
 use crate::trcf::basicthresholder::BasicThresholder;
 use crate::trcf::types::CorrectionMode::{
     ANOMALY_IN_SHINGLE, CONDITIONAL_FORECAST, DATA_DRIFT, FORECAST, NOISE,
@@ -10,8 +10,6 @@ use crate::trcf::types::ScoringStrategy::EXPECTED_INVERSE_HEIGHT;
 use crate::trcf::types::TransformMethod::{DIFFERENCE, NORMALIZE_DIFFERENCE};
 use crate::types::Result;
 use crate::util::{absf32, maxf32, minf32};
-use num::abs;
-use std::f32::consts::E;
 
 const DEFAULT_NORMALIZATION_PRECISION: f32 = 1e-3;
 const DEFAULT_NUMBER_OF_MAX_ATTRIBUTORS: usize = 5;

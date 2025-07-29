@@ -49,17 +49,17 @@ impl MultiDimDataWithKey {
 
         for i in 0..num {
             let mut elem = vec![0.0; base_dimension];
-            let flag = noiserng.gen::<f32>() < 0.01;
+            let flag = noiserng.random::<f32>() < 0.01;
             let mut new_change = vec![0.0; base_dimension];
             let mut used: bool = false;
             for j in 0..base_dimension {
                 elem[j] = amplitude[j]
                     * (2.0 * PI * (i + phase[j]) as f32 / period[j] as f32).cos()
-                    + noise * noiserng.gen::<f32>();
-                if flag && noiserng.gen::<f64>() < 0.3 {
-                    let factor: f32 = 5.0 * (1.0 + noiserng.gen::<f32>());
+                    + noise * noiserng.random::<f32>();
+                if flag && noiserng.random::<f64>() < 0.3 {
+                    let factor: f32 = 5.0 * (1.0 + noiserng.random::<f32>());
                     let mut change: f32 = factor * noise;
-                    if noiserng.gen::<f32>() < 0.5 {
+                    if noiserng.random::<f32>() < 0.5 {
                         change = -change;
                     }
                     elem[j] += change;
@@ -117,7 +117,7 @@ impl MultiDimDataWithKey {
         let mut labels = Vec::new();
         for _j in 0..num {
             let mut i = 0;
-            let mut wt: f32 = sum * rng.gen::<f32>();
+            let mut wt: f32 = sum * rng.random::<f32>();
             while wt > weight[i] {
                 wt -= weight[i];
                 i += 1;
@@ -136,17 +136,17 @@ impl MultiDimDataWithKey {
 }
 
 fn next_element(mean: f32, scale: f32, rng: &mut ChaCha20Rng) -> f32 {
-    let mut r: f32 = f64::sqrt(-2.0f64 * f64::ln(rng.gen::<f64>())) as f32;
+    let mut r: f32 = f64::sqrt(-2.0f64 * f64::ln(rng.random::<f64>())) as f32;
     // the following is to discard inf being returned from ln()
     while r.is_infinite() {
-        r = f64::sqrt(-2.0f64 * f64::ln(rng.gen::<f64>())) as f32;
+        r = f64::sqrt(-2.0f64 * f64::ln(rng.random::<f64>())) as f32;
     }
 
-    let switch: f32 = rng.gen();
+    let switch: f32 = rng.random();
     if 0.5 < switch {
-        mean + scale * r * f32::cos(2.0 * PI * rng.gen::<f32>())
+        mean + scale * r * f32::cos(2.0 * PI * rng.random::<f32>())
     } else {
-        mean + scale * r * f32::sin(2.0 * PI * rng.gen::<f32>())
+        mean + scale * r * f32::sin(2.0 * PI * rng.random::<f32>())
     }
 }
 

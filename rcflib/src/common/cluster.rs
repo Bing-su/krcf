@@ -4,9 +4,8 @@ use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use rand_core::RngCore;
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
-use std::cmp::{max, min};
-use std::ops::{Deref, Index};
-use std::slice;
+use std::cmp::max;
+use std::ops::Index;
 
 const PHASE2_THRESHOLD: usize = 2;
 const SEPARATION_RATIO_FOR_MERGE: f64 = 0.8;
@@ -195,7 +194,7 @@ impl Center {
                 let mut samples = Vec::new();
                 let mut rng = ChaCha20Rng::seed_from_u64(0);
                 for i in 0..self.points.len() {
-                    if rng.gen::<f64>() < (200.0 * self.points[i].1 as f64) / self.weight {
+                    if rng.random::<f64>() < (200.0 * self.points[i].1 as f64) / self.weight {
                         samples.push((self.points[i].0, 1.0));
                     }
                 }
@@ -563,7 +562,7 @@ fn down_sample<'a, Z>(
     for j in 0..points.len() {
         let point_weight = get_weight(j, &points, &weights);
         if point_weight <= (0.005 * total_weight) as f32
-            && rng.gen::<f64>() < approximate_bound as f64 / (points.len() as f64)
+            && rng.random::<f64>() < approximate_bound as f64 / (points.len() as f64)
         {
             let t = point_weight as f64
                 * (points.len() as f64 / approximate_bound as f64)
@@ -651,7 +650,7 @@ where
     };
 
     for _k in 0..10 * max_allowed {
-        let wt = (rng.gen::<f64>() * sampled_sum as f64) as f32;
+        let wt = (rng.random::<f64>() * sampled_sum as f64) as f32;
         let mut min_dist = f64::MAX;
         let (index, weight) = if dictionary.len() > approximate_bound {
             let i = pick(&samples, wt);

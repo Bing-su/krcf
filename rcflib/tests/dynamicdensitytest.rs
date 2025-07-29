@@ -7,7 +7,7 @@ use std::f32::consts::PI;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use rcflib::rcf::{RCFBuilder, RCFOptionsBuilder};
-use rcflib::{common::multidimdatawithkey::MultiDimDataWithKey, rcf::RCF};
+use rcflib::common::multidimdatawithkey::MultiDimDataWithKey;
 
 /// try cargo test --release
 /// these tests are designed to be longish
@@ -59,15 +59,15 @@ fn dynamic_density() {
         let value = density.total();
 
         if (degree <= 60)
-            || ((degree >= 120) && (degree <= 180))
-            || ((degree >= 240) && (degree <= 300))
+            || (120..=180).contains(&degree)
+            || (240..=300).contains(&degree)
         {
             assert!(density.total() < 0.8 * capacity as f64); // the fan is above at 90,210,330
         }
 
-        if ((degree >= 75) && (degree <= 105))
-            || ((degree >= 195) && (degree <= 225))
-            || ((degree >= 315) && (degree <= 345))
+        if (75..=105).contains(&degree)
+            || (195..=225).contains(&degree)
+            || (315..=345).contains(&degree)
         {
             assert!(density.total() > 0.5 * (capacity as f64));
         }
@@ -82,32 +82,32 @@ fn dynamic_density() {
         let blade_to_the_right = density.low[0];
 
         // the tests below have a freedom of 10% of the total value
-        if ((degree >= 75) && (degree <= 85))
-            || ((degree >= 195) && (degree <= 205))
-            || ((degree >= 315) && (degree <= 325))
+        if (75..=85).contains(&degree)
+            || (195..=205).contains(&degree)
+            || (315..=325).contains(&degree)
         {
             assert!(blade_above_in_y + 0.1 * value > blade_below_in_y);
             assert!(blade_above_in_y + 0.1 * value > blade_to_the_right);
         }
 
-        if ((degree >= 95) && (degree <= 105))
-            || ((degree >= 215) && (degree <= 225))
-            || ((degree >= 335) && (degree <= 345))
+        if (95..=105).contains(&degree)
+            || (215..=225).contains(&degree)
+            || (335..=345).contains(&degree)
         {
             assert!(blade_below_in_y + 0.1 * value > blade_above_in_y);
             assert!(blade_below_in_y + 0.1 * value > blade_to_the_right);
         }
 
-        if ((degree >= 60) && (degree <= 75))
-            || ((degree >= 180) && (degree <= 195))
-            || ((degree >= 300) && (degree <= 315))
+        if (60..=75).contains(&degree)
+            || (180..=195).contains(&degree)
+            || (300..=315).contains(&degree)
         {
             assert!(blade_above_in_y + 0.1 * value > blade_to_the_left);
             assert!(blade_above_in_y + 0.1 * value > blade_to_the_right);
         }
 
-        if ((degree >= 105) && (degree <= 120))
-            || ((degree >= 225) && (degree <= 240))
+        if (105..=120).contains(&degree)
+            || (225..=240).contains(&degree)
             || (degree >= 345)
         {
             assert!(blade_below_in_y + 0.1 * value > blade_to_the_left);
@@ -115,9 +115,9 @@ fn dynamic_density() {
         }
 
         // fans are farthest to the left at 30,150 and 270
-        if ((degree >= 15) && (degree <= 45))
-            || ((degree >= 135) && (degree <= 165))
-            || ((degree >= 255) && (degree <= 285))
+        if (15..=45).contains(&degree)
+            || (135..=165).contains(&degree)
+            || (255..=285).contains(&degree)
         {
             assert!(
                 blade_to_the_left + 0.1 * value
@@ -133,15 +133,15 @@ fn generate_fan(num_per_blade: usize, blades: usize) -> Vec<Vec<f32>> {
 
     let data_with_key = MultiDimDataWithKey::mixture(
         num_per_blade * blades,
-        &vec![vec![0f32, 0f32]],
-        &vec![vec![0.05, 0.2]],
-        &vec![1.0f32],
+        &[vec![0f32, 0f32]],
+        &[vec![0.05, 0.2]],
+        &[1.0f32],
         0,
     )
     .unwrap();
     let mut rng = ChaCha20Rng::seed_from_u64(72345);
     for point in data_with_key.data {
-        let toss: f64 = rng.gen();
+        let toss: f64 = rng.random();
         let mut i = 0;
         while i < blades + 1 {
             if toss < i as f64 / blades as f64 {
@@ -163,5 +163,5 @@ fn rotate_clockwise(point: &[f32], theta: f32) -> Vec<f32> {
     let mut result = vec![0.0f32; 2];
     result[0] = theta.cos() * point[0] + theta.sin() * point[1];
     result[1] = -theta.sin() * point[0] + theta.cos() * point[1];
-    return result;
+    result
 }

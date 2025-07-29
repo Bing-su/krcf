@@ -8,7 +8,7 @@ use crate::trcf::types::ForestMode::STANDARD;
 use crate::trcf::types::ScoringStrategy::EXPECTED_INVERSE_HEIGHT;
 use crate::trcf::types::{ScoringStrategy, TransformMethod};
 use crate::types::Result;
-use crate::util::{check_argument, maxf32, minf32};
+use crate::util::{check_argument, maxf32};
 use rand_chacha::ChaCha20Rng;
 use rand_core::{RngCore, SeedableRng};
 use rayon::prelude::*;

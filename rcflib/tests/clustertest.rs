@@ -122,7 +122,7 @@ fn core(
     seed: u64,
     distance: fn(&[f32], &[f32]) -> f64,
 ) -> bool {
-    println!(" starting {}", test_dimension);
+    println!(" starting {test_dimension}");
     let yard_stick = distance(&vec![0.0; test_dimension], &vec![1.0; test_dimension]) as f32;
     let data_with_key = gen_data(data_size, test_dimension, seed, yard_stick);
     let mut input = Vec::new();
@@ -138,22 +138,22 @@ fn core(
     .unwrap();
     let answer = (result.len() == 2 * test_dimension)
         && test_center(&mut result, test_dimension, yard_stick);
-    println!(" done {} {}", test_dimension, answer);
+    println!(" done {test_dimension} {answer}");
     answer
 }
 
 #[test]
 fn benchmark_cluster() {
     let mut generator = ThreadRng::default();
-    let one_seed: u64 = generator.gen();
-    println!(" single seed is {}", one_seed);
+    let one_seed: u64 = generator.random();
+    println!(" single seed is {one_seed}");
     let mut rng = ChaCha20Rng::seed_from_u64(one_seed);
 
     let mut error = 0;
     for _ in 0..10 {
         let seed = rng.next_u64();
-        let d = rng.gen_range(3..23);
-        error += (core(200000, d, seed, l1distance) == false) as i32;
+        let d = rng.random_range(3..23);
+        error += (!core(200000, d, seed, l1distance)) as i32;
     }
     assert!(error < 5);
 }
@@ -164,7 +164,7 @@ fn core_as_slice_uniform(
     seed: u64,
     distance: fn(&[f32], &[f32]) -> f64,
 ) -> bool {
-    println!(" starting {}", test_dimension);
+    println!(" starting {test_dimension}");
     let yard_stick = distance(&vec![0.0; test_dimension], &vec![1.0; test_dimension]) as f32;
     let data_with_key = gen_data(data_size, test_dimension, seed, yard_stick);
 
@@ -177,22 +177,22 @@ fn core_as_slice_uniform(
             .unwrap();
     let answer = (result.len() == 2 * test_dimension)
         && test_center(&mut result, test_dimension, yard_stick);
-    println!(" done {} {}", test_dimension, answer);
+    println!(" done {test_dimension} {answer}");
     answer
 }
 
 #[test]
 fn benchmark_slice_uniform() {
     let mut generator = ThreadRng::default();
-    let one_seed: u64 = generator.gen();
-    println!(" single seed is {}", one_seed);
+    let one_seed: u64 = generator.random();
+    println!(" single seed is {one_seed}");
     let mut rng = ChaCha20Rng::seed_from_u64(one_seed);
 
     let mut error = 0;
     for _ in 0..10 {
         let seed = rng.next_u64();
-        let d = rng.gen_range(3..23);
-        error += (core_as_slice_uniform(200000, d, seed, l1distance) == false) as i32;
+        let d = rng.random_range(3..23);
+        error += (!core_as_slice_uniform(200000, d, seed, l1distance)) as i32;
     }
     assert!(error < 5);
 }
@@ -203,7 +203,7 @@ fn core_as_slice_weighted(
     seed: u64,
     distance: fn(&[f32], &[f32]) -> f64,
 ) -> bool {
-    println!(" starting {}", test_dimension);
+    println!(" starting {test_dimension}");
     let yard_stick = distance(&vec![0.0; test_dimension], &vec![1.0; test_dimension]) as f32;
     let data_with_key = gen_data(data_size, test_dimension, seed, yard_stick);
     let mut input: Vec<&[f32]> = Vec::new();
@@ -221,28 +221,28 @@ fn core_as_slice_weighted(
     .unwrap();
     let answer = (result.len() == 2 * test_dimension)
         && test_center(&mut result, test_dimension, yard_stick);
-    println!(" done {} {}", test_dimension, answer);
+    println!(" done {test_dimension} {answer}");
     answer
 }
 
 #[test]
 fn benchmark_slice_weighted() {
     let mut generator = ThreadRng::default();
-    let one_seed: u64 = generator.gen();
-    println!(" single seed is {}", one_seed);
+    let one_seed: u64 = generator.random();
+    println!(" single seed is {one_seed}");
     let mut rng = ChaCha20Rng::seed_from_u64(one_seed);
 
     let mut error = 0;
     for _ in 0..10 {
         let seed = rng.next_u64();
-        let d = rng.gen_range(3..23);
-        error += (core_as_slice_weighted(200000, d, seed, l1distance) == false) as i32;
+        let d = rng.random_range(3..23);
+        error += (!core_as_slice_weighted(200000, d, seed, l1distance)) as i32;
     }
     assert!(error < 5);
 }
 
 fn vec_dist(a: &Vec<f32>, b: &Vec<f32>) -> f64 {
-    l1distance(&a, &b)
+    l1distance(a, b)
 }
 
 fn core_vec(
@@ -251,7 +251,7 @@ fn core_vec(
     seed: u64,
     distance: fn(&Vec<f32>, &Vec<f32>) -> f64,
 ) -> bool {
-    println!(" starting {}", test_dimension);
+    println!(" starting {test_dimension}");
     let yard_stick = distance(&vec![0.0; test_dimension], &vec![1.0; test_dimension]) as f32;
     let data_with_key = gen_data(data_size, test_dimension, seed, yard_stick);
     let mut input = Vec::new();
@@ -264,22 +264,22 @@ fn core_vec(
             .unwrap();
     let answer = (result.len() == 2 * test_dimension)
         && test_center(&mut result, test_dimension, yard_stick);
-    println!(" done {} {}", test_dimension, answer);
+    println!(" done {test_dimension} {answer}");
     answer
 }
 
 #[test]
 fn benchmark_vec() {
     let mut generator = ThreadRng::default();
-    let one_seed: u64 = generator.gen();
-    println!(" single seed is {}", one_seed);
+    let one_seed: u64 = generator.random();
+    println!(" single seed is {one_seed}");
     let mut rng = ChaCha20Rng::seed_from_u64(one_seed);
 
     let mut error = 0;
     for _ in 0..10 {
         let seed = rng.next_u64();
-        let d = rng.gen_range(3..23);
-        error += (core_vec(200000, d, seed, vec_dist) == false) as i32;
+        let d = rng.random_range(3..23);
+        error += (!core_vec(200000, d, seed, vec_dist)) as i32;
     }
     assert!(error < 5);
 }
@@ -290,7 +290,7 @@ fn multi_as_vec(
     seed: u64,
     distance: fn(&[f32], &[f32]) -> f64,
 ) -> bool {
-    println!(" starting {}", test_dimension);
+    println!(" starting {test_dimension}");
     let yard_stick = distance(&vec![0.0; test_dimension], &vec![1.0; test_dimension]) as f32;
     let data_with_key = gen_data(data_size, test_dimension, seed, yard_stick);
     let mut input: Vec<Vec<f32>> = Vec::new();
@@ -322,22 +322,22 @@ fn multi_as_vec(
             answer = answer && abs(result[j].representatives()[0].0[i]) < 0.5;
         }
     }
-    println!(" done {} {}", test_dimension, answer);
+    println!(" done {test_dimension} {answer}");
     answer
 }
 
 #[test]
 fn benchmark_multi_vec() {
     let mut generator = ThreadRng::default();
-    let one_seed: u64 = generator.gen();
-    println!(" single seed is {}", one_seed);
+    let one_seed: u64 = generator.random();
+    println!(" single seed is {one_seed}");
     let mut rng = ChaCha20Rng::seed_from_u64(one_seed);
 
     let mut error = 0;
     for _ in 0..10 {
         let seed = rng.next_u64();
-        let d = rng.gen_range(3..23);
-        error += (multi_as_vec(200000, d, seed, l1distance) == false) as i32;
+        let d = rng.random_range(3..23);
+        error += (!multi_as_vec(200000, d, seed, l1distance)) as i32;
     }
     assert!(error < 5);
 }
@@ -348,7 +348,7 @@ fn multi_as_ref(
     seed: u64,
     distance: fn(&[f32], &[f32]) -> f64,
 ) -> bool {
-    println!(" starting {}", test_dimension);
+    println!(" starting {test_dimension}");
     let yard_stick = distance(&vec![0.0; test_dimension], &vec![1.0; test_dimension]) as f32;
     let data_with_key = gen_data(data_size, test_dimension, seed, yard_stick);
     let mut input = Vec::new();
@@ -380,22 +380,22 @@ fn multi_as_ref(
             answer = answer && abs(result[j].representatives()[0].0[i]) < 0.5;
         }
     }
-    println!(" done {} {}", test_dimension, answer);
+    println!(" done {test_dimension} {answer}");
     answer
 }
 
 #[test]
 fn benchmark_multi_ref() {
     let mut generator = ThreadRng::default();
-    let one_seed: u64 = generator.gen();
-    println!(" single seed is {}", one_seed);
+    let one_seed: u64 = generator.random();
+    println!(" single seed is {one_seed}");
     let mut rng = ChaCha20Rng::seed_from_u64(one_seed);
 
     let mut error = 0;
     for _ in 0..10 {
         let seed = rng.next_u64();
-        let d = rng.gen_range(3..23);
-        error += (multi_as_ref(200000, d, seed, l1distance) == false) as i32;
+        let d = rng.random_range(3..23);
+        error += (!multi_as_ref(200000, d, seed, l1distance)) as i32;
     }
     assert!(error < 5);
 }
@@ -406,7 +406,7 @@ fn multi_as_weighted_ref(
     seed: u64,
     distance: fn(&[f32], &[f32]) -> f64,
 ) -> bool {
-    println!(" starting {}", test_dimension);
+    println!(" starting {test_dimension}");
     let yard_stick = distance(&vec![0.0; test_dimension], &vec![1.0; test_dimension]) as f32;
     let data_with_key = gen_data(data_size, test_dimension, seed, yard_stick);
     let mut input = Vec::new();
@@ -438,22 +438,22 @@ fn multi_as_weighted_ref(
             answer = answer && abs(result[j].representatives()[0].0[i]) < 0.5;
         }
     }
-    println!(" done {} {}", test_dimension, answer);
+    println!(" done {test_dimension} {answer}");
     answer
 }
 
 #[test]
 fn benchmark_multi_weighted_ref() {
     let mut generator = ThreadRng::default();
-    let one_seed: u64 = generator.gen();
-    println!(" single seed is {}", one_seed);
+    let one_seed: u64 = generator.random();
+    println!(" single seed is {one_seed}");
     let mut rng = ChaCha20Rng::seed_from_u64(one_seed);
 
     let mut error = 0;
     for _ in 0..10 {
         let seed = rng.next_u64();
-        let d = rng.gen_range(3..23);
-        error += (multi_as_weighted_ref(200000, d, seed, l1distance) == false) as i32;
+        let d = rng.random_range(3..23);
+        error += (!multi_as_weighted_ref(200000, d, seed, l1distance)) as i32;
     }
     assert!(error < 5);
 }
@@ -464,7 +464,7 @@ fn multi_as_vec_weighted(
     seed: u64,
     distance: fn(&[f32], &[f32]) -> f64,
 ) -> bool {
-    println!(" starting {}", test_dimension);
+    println!(" starting {test_dimension}");
     let yard_stick = distance(&vec![0.0; test_dimension], &vec![1.0; test_dimension]) as f32;
     let data_with_key = gen_data(data_size, test_dimension, seed, yard_stick);
     let mut input: Vec<Vec<f32>> = Vec::new();
@@ -499,22 +499,22 @@ fn multi_as_vec_weighted(
             answer = answer && abs(result[j].representatives()[0].0[i]) < 0.5;
         }
     }
-    println!(" done {} {}", test_dimension, answer);
+    println!(" done {test_dimension} {answer}");
     answer
 }
 
 #[test]
 fn benchmark_multi_vec_weighted() {
     let mut generator = ThreadRng::default();
-    let one_seed: u64 = generator.gen();
-    println!(" single seed is {}", one_seed);
+    let one_seed: u64 = generator.random();
+    println!(" single seed is {one_seed}");
     let mut rng = ChaCha20Rng::seed_from_u64(one_seed);
 
     let mut error = 0;
     for _ in 0..10 {
         let seed = rng.next_u64();
-        let d = rng.gen_range(3..23);
-        error += (multi_as_vec_weighted(200000, d, seed, l1distance) == false) as i32;
+        let d = rng.random_range(3..23);
+        error += (!multi_as_vec_weighted(200000, d, seed, l1distance)) as i32;
     }
     assert!(error < 5);
 }
