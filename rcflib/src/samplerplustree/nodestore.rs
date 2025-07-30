@@ -27,6 +27,7 @@ use crate::{
 ///
 
 #[repr(C)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct VectorNodeStore<C, P, N>
 where
     C: Location,
@@ -39,7 +40,6 @@ where
     capacity: usize,
     dimensions: usize,
     using_transforms: bool,
-    project_to_tree: fn(Vec<f32>) -> Vec<f32>,
     bounding_box_cache_fraction: f64,
     parent_index: Vec<N>,
     mass: Vec<N>,
@@ -221,7 +221,6 @@ where
         store_attributes: bool,
         store_pointsum: bool,
         propagate_attributes: bool,
-        project_to_tree: fn(Vec<f32>) -> Vec<f32>,
         bounding_box_cache_fraction: f64,
     ) -> Result<Self> {
         check_argument(
@@ -239,7 +238,6 @@ where
             capacity,
             dimensions,
             using_transforms,
-            project_to_tree,
             bounding_box_cache_fraction,
             left_index: vec![null_node.try_into().unwrap(); capacity - 1],
             right_index: vec![null_node.try_into().unwrap(); capacity - 1],
@@ -735,8 +733,7 @@ where
     ) -> Result<BoundingBox> {
         if self.is_leaf(index) {
             return if self.using_transforms {
-                let point =
-                    &(self.project_to_tree)(point_store.copy(self.leaf_point_index(index)?)?);
+                let point = &point_store.copy(self.leaf_point_index(index)?)?;
                 BoundingBox::new(point, point)
             } else {
                 let point = point_store
@@ -964,8 +961,7 @@ where
     ) -> Result<()> {
         if self.is_leaf(sibling) {
             if self.using_transforms {
-                let point =
-                    &(self.project_to_tree)(point_store.copy(self.leaf_point_index(sibling)?)?);
+                let point = &point_store.copy(self.leaf_point_index(sibling)?)?;
                 (*first).check_contains_and_add_point(point);
                 (*second).check_contains_and_add_point(point);
             } else {
@@ -1019,8 +1015,7 @@ where
     ) -> Result<()> {
         if self.is_leaf(sibling) {
             if self.using_transforms {
-                let point =
-                    &(self.project_to_tree)(point_store.copy(self.leaf_point_index(sibling)?)?);
+                let point = &point_store.copy(self.leaf_point_index(sibling)?)?;
                 (*bounding_box).check_contains_and_add_point(point);
             } else {
                 let point = point_store
@@ -1058,7 +1053,7 @@ where
         point_store: &PS,
     ) -> Result<bool> {
         if self.is_leaf(index) {
-            let point = (self.project_to_tree)(point_store.copy(self.leaf_point_index(index)?)?);
+            let point = point_store.copy(self.leaf_point_index(index)?)?;
             return Ok(point[dim] < value);
         }
         // both are left -- we want both to be less than value
@@ -1076,7 +1071,7 @@ where
         point_store: &PS,
     ) -> Result<bool> {
         if self.is_leaf(index) {
-            let point = (self.project_to_tree)(point_store.copy(self.leaf_point_index(index)?)?);
+            let point = point_store.copy(self.leaf_point_index(index)?)?;
             return Ok(point[dim] >= value);
         }
         // both are right -- we want the subtree to be greater or equal value

@@ -20,6 +20,7 @@ use crate::{
 };
 
 #[repr(C)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SamplerPlusTree<C, P, N>
 where
     C: Location,

@@ -26,6 +26,7 @@ extern crate rand;
 extern crate rand_chacha;
 
 #[repr(C)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RCFTree<C, P, N>
 where
     C: Location,
@@ -69,7 +70,7 @@ where
         bounding_box_cache_fraction: f64,
         random_seed: u64,
     ) -> Result<Self> {
-        let project_to_tree: fn(Vec<f32>) -> Vec<f32> = { |x| x };
+        // let project_to_tree: fn(Vec<f32>) -> Vec<f32> = { |x| x };
         let node_store = VectorNodeStore::<C, P, N>::new(
             capacity,
             dimensions,
@@ -77,7 +78,6 @@ where
             store_attributes,
             store_pointsum,
             propagate_attributes,
-            project_to_tree,
             bounding_box_cache_fraction,
         )?;
         let root = node_store.null_node();

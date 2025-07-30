@@ -5,6 +5,7 @@ use crate::types::Result;
 use crate::util::check_argument;
 
 #[repr(C)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Sampler<P> {
     capacity: usize,
     weights: Vec<f32>,
