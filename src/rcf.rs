@@ -1,5 +1,3 @@
-use std::collections::binary_heap::PeekMut;
-
 use bincode::{Decode, Encode};
 use rcflib::{
     common::divector::DiVector,
@@ -52,10 +50,7 @@ impl PyRCFOptions {
         set_option!(self.parallel_execution_enabled, parallel_enabled);
         set_option!(self.lambda, time_decay);
 
-        options
-            .internal_shingling(true)
-            .store_pointsum(true)
-            .propagate_attribute_vectors(true);
+        options.internal_shingling(true).store_pointsum(true);
         options
     }
 
@@ -102,7 +97,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_default_pyrcfoptions() {
+    fn test_default_rcfoptions() {
         let opts = PyRCFOptions::default();
         assert_eq!(opts.dimensions, 1);
         assert_eq!(opts.shingle_size, 1);
@@ -115,7 +110,7 @@ mod tests {
     }
 
     #[test]
-    fn test_to_rcf_builder_sets_options() {
+    fn test_to_rcf_builder() {
         let opts = PyRCFOptions {
             dimensions: 3,
             shingle_size: 2,
@@ -127,7 +122,10 @@ mod tests {
             lambda: Some(0.01),
         };
         let builder = opts.to_rcf_builder();
-        // 빌더의 필드 값을 직접 확인할 수 없으므로, 빌드가 성공하는지만 체크
+
+        let rcf = builder.build();
+        assert!(rcf.is_ok());
+
         let rcf = builder.build_large_simple::<u64>();
         assert!(rcf.is_ok());
     }
