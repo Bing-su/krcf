@@ -14,9 +14,24 @@ use rand_core::{RngCore, SeedableRng};
 use rayon::prelude::*;
 use std::collections::HashMap;
 
+#[derive(Copy, Clone)]
+pub struct MultiTRCFLabel(pub u64, pub u64);
+
+impl Into<u64> for MultiTRCFLabel {
+    fn into(self) -> u64 {
+        self.1
+    }
+}
+
+impl From<(u64, u64)> for MultiTRCFLabel {
+    fn from(value: (u64, u64)) -> Self {
+        MultiTRCFLabel(value.0, value.1)
+    }
+}
+
 pub struct MultiTRCF {
     arms: usize,
-    rcfs: Vec<Box<dyn AugmentedRCF<(u64, u64), u64> + Send + Sync>>,
+    rcfs: Vec<Box<dyn AugmentedRCF<MultiTRCFLabel, u64> + Send + Sync>>,
     states: HashMap<u64, State>,
     input_dimensions: usize,
     shingle_size: usize,
@@ -155,9 +170,12 @@ impl MultiTRCF {
                         // if there is only one arm then the following will be equivalent -- first branch would
                         // be taken since y.0 == 1 in such a case
                         if y.0 != self.arms {
-                            self.rcfs[y.0].update(x, y.1)
+                            self.rcfs[y.0].update(x, MultiTRCFLabel::from(y.1))
                         } else {
-                            self.rcfs.iter_mut().map(|z| z.update(x, y.1)).collect()
+                            self.rcfs
+                                .iter_mut()
+                                .map(|z| z.update(x, MultiTRCFLabel::from(y.1)))
+                                .collect()
                         }
                     }
                     None => Ok(()),
@@ -200,7 +218,7 @@ pub struct MultiTRCFBuilder {
     arms: usize,
     probability: f32,
     scoring_strategy: ScoringStrategy,
-    rcf_options: RCFOptions<(u64, u64), u64>,
+    rcf_options: RCFOptions<MultiTRCFLabel, u64>,
     trcf_options: TRCFOptions,
 }
 
@@ -286,7 +304,7 @@ impl MultiTRCFBuilder {
         let mut rcfs = Vec::new();
         for _i in 0..self.arms {
             rcfs.push(
-                RCFBuilder::<(u64, u64), u64>::new(self.input_dimensions, self.shingle_size)
+                RCFBuilder::<MultiTRCFLabel, u64>::new(self.input_dimensions, self.shingle_size)
                     .tree_capacity(self.rcf_options.capacity)
                     .number_of_trees(self.rcf_options.number_of_trees)
                     .time_decay(time_decay)
@@ -295,7 +313,7 @@ impl MultiTRCFBuilder {
                     .initial_accept_fraction(self.rcf_options.initial_accept_fraction)
                     .internal_shingling(false)
                     .random_seed(random_seed)
-                    .build_to_u64(attribute_creator)
+                    .build_to_u64(|_x: &[MultiTRCFLabel], y: MultiTRCFLabel| Ok(y.into()))
                     .unwrap(),
             );
             random_seed += 1;
@@ -317,8 +335,8 @@ impl MultiTRCFBuilder {
     }
 }
 
-impl RCFOptionsBuilder<(u64, u64), u64> for MultiTRCFBuilder {
-    fn get_rcf_options(&mut self) -> &mut RCFOptions<(u64, u64), u64> {
+impl RCFOptionsBuilder<MultiTRCFLabel, u64> for MultiTRCFBuilder {
+    fn get_rcf_options(&mut self) -> &mut RCFOptions<MultiTRCFLabel, u64> {
         &mut self.rcf_options
     }
 }

@@ -4,8 +4,8 @@ extern crate rcflib;
 
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
-use rcflib::rcf::{RCFBuilder, RCFOptionsBuilder};
 use rcflib::common::multidimdatawithkey::MultiDimDataWithKey;
+use rcflib::rcf::{RCFBuilder, RCFOptionsBuilder};
 
 /// try cargo test --release
 /// these tests are designed to be longish
@@ -52,15 +52,9 @@ fn impute_different_period() {
     for _i in 0..base_dimension {
         period.push(((1.0 + 0.2 * period_rng.random::<f32>()) * 60.0) as usize);
     }
-    let data_with_key = MultiDimDataWithKey::multi_cosine(
-        data_size,
-        &period,
-        &amplitude,
-        noise,
-        0,
-        base_dimension,
-    )
-    .unwrap();
+    let data_with_key =
+        MultiDimDataWithKey::multi_cosine(data_size, &period, &amplitude, noise, 0, base_dimension)
+            .unwrap();
 
     let _next_index = 0;
     let mut error = 0.0;

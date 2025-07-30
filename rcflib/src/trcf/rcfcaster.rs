@@ -6,9 +6,9 @@ use crate::trcf::basictrcf::{core_process, State, TRCFOptions, TRCFOptionsBuilde
 use crate::trcf::errorhandler::ErrorHandler;
 use crate::trcf::predictorcorrector::PredictorCorrector;
 use crate::trcf::preprocessor::PreprocessorBuilder;
+use crate::trcf::types::Calibration;
 use crate::trcf::types::Calibration::MINIMAL;
 use crate::trcf::types::ForestMode::STREAMING_IMPUTE;
-use crate::trcf::types::Calibration;
 use crate::types::Result;
 use crate::util::check_argument;
 

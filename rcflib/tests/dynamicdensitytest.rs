@@ -6,8 +6,8 @@ use std::f32::consts::PI;
 
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
-use rcflib::rcf::{RCFBuilder, RCFOptionsBuilder};
 use rcflib::common::multidimdatawithkey::MultiDimDataWithKey;
+use rcflib::rcf::{RCFBuilder, RCFOptionsBuilder};
 
 /// try cargo test --release
 /// these tests are designed to be longish
@@ -58,10 +58,7 @@ fn dynamic_density() {
         let density = forest.directional_density(&query_point).unwrap();
         let value = density.total();
 
-        if (degree <= 60)
-            || (120..=180).contains(&degree)
-            || (240..=300).contains(&degree)
-        {
+        if (degree <= 60) || (120..=180).contains(&degree) || (240..=300).contains(&degree) {
             assert!(density.total() < 0.8 * capacity as f64); // the fan is above at 90,210,330
         }
 
@@ -106,10 +103,7 @@ fn dynamic_density() {
             assert!(blade_above_in_y + 0.1 * value > blade_to_the_right);
         }
 
-        if (105..=120).contains(&degree)
-            || (225..=240).contains(&degree)
-            || (degree >= 345)
-        {
+        if (105..=120).contains(&degree) || (225..=240).contains(&degree) || (degree >= 345) {
             assert!(blade_below_in_y + 0.1 * value > blade_to_the_left);
             assert!(blade_below_in_y + 0.1 * value > blade_to_the_right);
         }

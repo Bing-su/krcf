@@ -61,8 +61,10 @@ where
 
 const SWITCH_THRESHOLD: f64 = 0.5;
 
-pub trait NodeStore<Label: Sync + Copy, Attributes: Sync + Copy + Hash + Eq + Send>:
-    BasicStore + BoxStore<Label, Attributes>
+pub trait NodeStore<
+    Label: Sync + Copy + Into<Attributes>,
+    Attributes: Sync + Copy + Hash + Eq + Send,
+>: BasicStore + BoxStore<Label, Attributes>
 {
 }
 
@@ -84,8 +86,10 @@ pub trait BasicStore {
     fn attribute_at_leaf(&self, point_index: usize) -> Result<Vec<(usize, usize)>>;
 }
 
-pub trait BoxStore<Label: Sync + Copy, Attributes: Sync + Copy + Hash + Eq + Send>:
-    BasicStore
+pub trait BoxStore<
+    Label: Sync + Copy + Into<Attributes>,
+    Attributes: Sync + Copy + Hash + Eq + Send,
+>: BasicStore
 {
     fn attribut_vec<PS: PointStore<Label, Attributes>>(
         &self,
@@ -543,7 +547,7 @@ where
     <C as TryFrom<usize>>::Error: Debug,
     <P as TryFrom<usize>>::Error: Debug,
     <N as TryFrom<usize>>::Error: Debug,
-    Label: Sync + Copy,
+    Label: Sync + Copy + Into<Attributes>,
     Attributes: Sync + Copy + Hash + Eq + Send,
 {
     fn attribut_vec<PS: PointStore<Label, Attributes>>(
@@ -1211,7 +1215,7 @@ where
     <C as TryFrom<usize>>::Error: Debug,
     <P as TryFrom<usize>>::Error: Debug,
     <N as TryFrom<usize>>::Error: Debug,
-    Label: Sync + Copy,
+    Label: Sync + Copy + Into<Attributes>,
     Attributes: Sync + Copy + Hash + Eq + Send,
 {
 }

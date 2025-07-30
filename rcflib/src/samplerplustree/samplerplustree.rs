@@ -86,7 +86,7 @@ where
     }
 
     pub fn update<
-        Label: Copy + Sync,
+        Label: Copy + Sync + Into<Attributes>,
         Attributes: Copy + Sync + Hash + Eq + Send,
         PS: PointStore<Label, Attributes>,
     >(
@@ -160,7 +160,7 @@ where
     where
         NodeView: UpdatableNodeView<Label, Attributes>,
         V: Visitor<NodeView, R>,
-        Label: Sync + Copy,
+        Label: Sync + Copy + Into<Attributes>,
         Attributes: Copy + Sync + Hash + Eq + Send,
         PS: PointStore<Label, Attributes>,
         R: Clone,
@@ -175,7 +175,11 @@ where
         )
     }
 
-    pub fn conditional_field<Label: Copy + Sync, Attributes: Copy + Sync + Hash + Eq + Send, PS>(
+    pub fn conditional_field<
+        Label: Copy + Sync + Into<Attributes>,
+        Attributes: Copy + Sync + Hash + Eq + Send,
+        PS,
+    >(
         &self,
         positions: &[usize],
         centrality: f64,

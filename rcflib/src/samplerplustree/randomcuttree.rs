@@ -96,7 +96,7 @@ where
     }
 
     pub fn add<
-        Label: Copy + Sync,
+        Label: Copy + Sync + Into<Attributes>,
         Attributes: Copy + Sync + Hash + Eq + Send,
         PS: PointStore<Label, Attributes>,
     >(
@@ -236,7 +236,7 @@ where
     }
 
     pub fn delete<
-        Label: Copy + Sync,
+        Label: Copy + Sync + Into<Attributes>,
         Attributes: Copy + Sync + Hash + Eq + Send,
         PS: PointStore<Label, Attributes>,
     >(
@@ -309,7 +309,7 @@ where
     }
 
     pub fn conditional_field<
-        Label: Copy + Sync,
+        Label: Copy + Sync + Into<Attributes>,
         Attributes: Copy + Sync + Hash + Eq + Send,
         PS: PointStore<Label, Attributes>,
     >(
@@ -356,7 +356,7 @@ where
     ) -> Result<()>
     where
         V: SimpleMultiVisitor<NodeView, R>,
-        Label: Copy + Sync,
+        Label: Copy + Sync + Into<Attributes>,
         Attributes: Copy + Sync + Hash + Eq + Send,
         NodeView: UpdatableMultiNodeView<Label, Attributes>,
         PS: PointStore<Label, Attributes>,
@@ -457,7 +457,7 @@ where
         PS: PointStore<Label, Attributes>,
         V: Visitor<NodeView, R>,
         R: Clone,
-        Label: Copy + Sync,
+        Label: Copy + Sync + Into<Attributes>,
         Attributes: Copy + Sync + Hash + Eq + Send,
         NodeView: UpdatableNodeView<Label, Attributes>,
     {
@@ -501,7 +501,7 @@ where
 pub trait Traversable<NodeView, V, R, Label, Attributes>
 where
     V: Visitor<NodeView, R>,
-    Label: Copy + Sync,
+    Label: Copy + Sync + Into<Attributes>,
     Attributes: Copy + Sync + Hash + Eq + Send,
 {
     fn traverse<PS: PointStore<Label, Attributes>>(
@@ -527,7 +527,7 @@ where
     N: Location,
     <N as TryFrom<usize>>::Error: Debug,
     usize: From<N>,
-    Label: Copy + Sync,
+    Label: Copy + Sync + Into<Attributes>,
     Attributes: Copy + Sync + Hash + Eq + Send,
     NodeView: UpdatableNodeView<Label, Attributes>,
     V: Visitor<NodeView, R>,

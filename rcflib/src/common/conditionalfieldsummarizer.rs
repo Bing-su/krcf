@@ -54,7 +54,10 @@ impl FieldSummarizer {
         }
     }
 
-    pub fn summarize_list<Label: Copy + Sync + Send, Attributes: Copy + Sync + Hash + Eq + Send>(
+    pub fn summarize_list<
+        Label: Copy + Sync + Send + Into<Attributes>,
+        Attributes: Copy + Sync + Hash + Eq + Send,
+    >(
         &self,
         pointstore: &dyn PointStore<Label, Attributes>,
         point_list_with_distance: &[(f64, usize, f64)],

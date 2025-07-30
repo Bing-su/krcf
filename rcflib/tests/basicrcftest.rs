@@ -4,9 +4,7 @@ extern crate rcflib;
 
 use num::abs;
 use rcflib::rcf::{RCFBuilder, RCFOptionsBuilder};
-use rcflib::{
-    common::multidimdatawithkey::MultiDimDataWithKey, visitor::visitor::VisitorInfo,
-};
+use rcflib::{common::multidimdatawithkey::MultiDimDataWithKey, visitor::visitor::VisitorInfo};
 
 /// try cargo test --release
 /// these tests are designed to be longish

@@ -9,7 +9,7 @@ pub const MAX_ATTRIBUTES: usize = 10;
 
 pub trait PointStore<Label, Attributes>
 where
-    Label: Copy + Sync,
+    Label: Copy + Sync + Into<Attributes>,
     Attributes: Copy + Sync + Hash + Eq + Send,
 {
     fn shingled_point(&self, point: &[f32]) -> Result<Vec<f32>>;
@@ -35,7 +35,7 @@ where
 pub struct VectorizedPointStore<L, Label, Attributes>
 where
     L: Location,
-    Label: Copy + Sync,
+    Label: Copy + Sync + Into<Attributes>,
     Attributes: Copy + Sync + Hash + Eq + Send,
 {
     internal_shingling: bool,
@@ -73,7 +73,7 @@ impl<L, Label, Attributes> VectorizedPointStore<L, Label, Attributes>
 where
     L: Location,
     usize: From<L>,
-    Label: Copy + Sync + Send,
+    Label: Copy + Sync + Send + Into<Attributes>,
     Attributes: Copy + Sync + Hash + Eq + Send,
     <L as TryFrom<usize>>::Error: Debug,
 {
@@ -189,7 +189,7 @@ impl<L, Label, Attributes> PointStore<Label, Attributes>
 where
     L: Location,
     usize: From<L>,
-    Label: Copy + Sync + Send,
+    Label: Copy + Sync + Send + Into<Attributes>,
     Attributes: Copy + Sync + Eq + Hash + Send,
     <L as TryFrom<usize>>::Error: Debug,
 {

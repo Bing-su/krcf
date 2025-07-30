@@ -145,7 +145,7 @@ pub struct BasicTRCF {
     state: State,
 }
 
-pub fn core_process<U: ?Sized, Label: Sync + Copy, Attributes: Sync + Copy>(
+pub fn core_process<U: ?Sized, Label: Sync + Copy + Into<Attributes>, Attributes: Sync + Copy>(
     rcf: Option<&Box<U>>,
     state: &mut State,
     point: &[f32],

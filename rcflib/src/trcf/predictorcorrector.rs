@@ -50,7 +50,11 @@ impl PredictorCorrector {
         })
     }
 
-    pub fn expected_point<U: ?Sized, Label: Sync + Copy, Attributes: Sync + Copy>(
+    pub fn expected_point<
+        U: ?Sized,
+        Label: Sync + Copy + Into<Attributes>,
+        Attributes: Sync + Copy,
+    >(
         di_vector: &DiVector,
         max_attributors: usize,
         position: usize,
@@ -292,7 +296,11 @@ impl PredictorCorrector {
         return !(answer);
     }
 
-    fn explained_by_conditional_field<U: ?Sized, Label: Sync + Copy, Attributes: Sync + Copy>(
+    fn explained_by_conditional_field<
+        U: ?Sized,
+        Label: Sync + Copy + Into<Attributes>,
+        Attributes: Sync + Copy,
+    >(
         uncertainty_box: &[f32],
         point: &[f32],
         corrected_point: &[f32],
@@ -349,7 +357,11 @@ impl PredictorCorrector {
         }
     }
 
-    pub fn detect_and_modify<U: ?Sized, Label: Sync + Copy, Attributes: Sync + Copy>(
+    pub fn detect_and_modify<
+        U: ?Sized,
+        Label: Sync + Copy + Into<Attributes>,
+        Attributes: Sync + Copy,
+    >(
         &mut self,
         result: &mut Descriptor,
         last_descriptor: &Descriptor,

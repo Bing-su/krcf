@@ -10,7 +10,11 @@ use crate::{
 };
 use std::hash::Hash;
 
-pub trait UpdatableNodeView<Label: Copy + Sync, Attributes: Copy + Sync + Hash + Eq + Send> {
+pub trait UpdatableNodeView<
+    Label: Copy + Sync + Into<Attributes>,
+    Attributes: Copy + Sync + Hash + Eq + Send,
+>
+{
     fn create<NS: NodeStore<Label, Attributes>>(root: usize, node_store: &NS) -> Self;
     fn update_at_leaf<PS: PointStore<Label, Attributes>, NS: NodeStore<Label, Attributes>>(
         &mut self,
@@ -50,8 +54,10 @@ pub trait UpdatableNodeView<Label: Copy + Sync, Attributes: Copy + Sync + Hash +
     ) -> Result<()>;
 }
 
-pub trait UpdatableMultiNodeView<Label: Copy + Sync, Attributes: Copy + Sync + Hash + Eq + Send>:
-    UpdatableNodeView<Label, Attributes>
+pub trait UpdatableMultiNodeView<
+    Label: Copy + Sync + Into<Attributes>,
+    Attributes: Copy + Sync + Hash + Eq + Send,
+>: UpdatableNodeView<Label, Attributes>
 {
     fn create<NS: NodeStore<Label, Attributes>>(root: usize, node_store: &NS) -> Self;
     fn set_trigger_traversing_down<
@@ -124,7 +130,7 @@ impl SmallNodeView {
         self.leaf_duplicate
     }
     pub fn new<
-        Label: Copy + Sync,
+        Label: Copy + Sync + Into<Attributes>,
         Attributes: Copy + Sync + Hash + Eq + Send,
         NS: NodeStore<Label, Attributes>,
     >(
@@ -146,7 +152,7 @@ impl SmallNodeView {
     }
 }
 
-impl<Label: Copy + Sync, Attributes: Copy + Sync + Hash + Eq + Send>
+impl<Label: Copy + Sync + Into<Attributes>, Attributes: Copy + Sync + Hash + Eq + Send>
     UpdatableNodeView<Label, Attributes> for SmallNodeView
 {
     fn create<NS: NodeStore<Label, Attributes>>(root: usize, _node_store: &NS) -> Self {
@@ -297,7 +303,7 @@ impl MediumNodeView {
     pub fn leaf_point(&self) -> Vec<f32> {
         self.point_at_leaf.clone()
     }
-    pub fn new<Label: Copy + Sync, Attributes: Copy + Sync>(
+    pub fn new<Label: Copy + Sync + Into<Attributes>, Attributes: Copy + Sync>(
         root: usize,
         cut_dimension: usize,
         cut_value: f32,
@@ -322,7 +328,7 @@ impl MediumNodeView {
     }
 }
 
-impl<Label: Copy + Sync, Attributes: Copy + Sync + Hash + Eq + Send>
+impl<Label: Copy + Sync + Into<Attributes>, Attributes: Copy + Sync + Hash + Eq + Send>
     UpdatableNodeView<Label, Attributes> for MediumNodeView
 {
     fn create<NS: NodeStore<Label, Attributes>>(root: usize, node_store: &NS) -> Self {
@@ -450,7 +456,7 @@ impl<Label: Copy + Sync, Attributes: Copy + Sync + Hash + Eq + Send>
     }
 }
 
-impl<Label: Copy + Sync, Attributes: Copy + Sync + Hash + Eq + Send>
+impl<Label: Copy + Sync + Into<Attributes>, Attributes: Copy + Sync + Hash + Eq + Send>
     UpdatableMultiNodeView<Label, Attributes> for MediumNodeView
 {
     fn create<NS: NodeStore<Label, Attributes>>(root: usize, node_store: &NS) -> Self {
@@ -627,7 +633,7 @@ impl LargeNodeView {
         di_vector.assign_as_probability_of_cut(self.shadow_box.as_ref().unwrap(), point)
     }
 
-    pub fn new<Label: Copy + Sync, Attributes: Copy + Sync>(
+    pub fn new<Label: Copy + Sync + Into<Attributes>, Attributes: Copy + Sync>(
         root: usize,
         cut_dimension: usize,
         cut_value: f32,
@@ -656,7 +662,7 @@ impl LargeNodeView {
     }
 }
 
-impl<Label: Copy + Sync, Attributes: Copy + Sync + Hash + Eq + Send>
+impl<Label: Copy + Sync + Into<Attributes>, Attributes: Copy + Sync + Hash + Eq + Send>
     UpdatableNodeView<Label, Attributes> for LargeNodeView
 {
     fn create<NS: NodeStore<Label, Attributes>>(root: usize, node_store: &NS) -> Self {
@@ -779,7 +785,7 @@ impl<Label: Copy + Sync, Attributes: Copy + Sync + Hash + Eq + Send>
     }
 }
 
-impl<Label: Copy + Sync, Attributes: Copy + Sync + Hash + Eq + Send>
+impl<Label: Copy + Sync + Into<Attributes>, Attributes: Copy + Sync + Hash + Eq + Send>
     UpdatableMultiNodeView<Label, Attributes> for LargeNodeView
 {
     fn create<NS: NodeStore<Label, Attributes>>(root: usize, node_store: &NS) -> Self {

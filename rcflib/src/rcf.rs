@@ -219,7 +219,7 @@ where
     usize: From<P>,
     N: Location,
     usize: From<N>,
-    Label: Copy + Sync + Send,
+    Label: Copy + Sync + Send + Into<Attributes>,
     Attributes: Copy + Sync + Hash + Eq + Send,
 {
     id: u64,
@@ -252,7 +252,7 @@ where
     usize: From<P>,
     N: Location,
     usize: From<N>,
-    Label: Copy + Sync + Send,
+    Label: Copy + Sync + Send + Into<Attributes>,
     Attributes: Copy + Sync + Eq + Hash + Send,
     <C as TryFrom<usize>>::Error: Debug,
     <L as TryFrom<usize>>::Error: Debug,
@@ -484,7 +484,7 @@ where
     usize: From<P>,
     N: Location,
     usize: From<N>,
-    Label: Copy + Sync + Send,
+    Label: Copy + Sync + Send + Into<Attributes>,
     Attributes: Copy + Sync + Hash + Eq + Send,
     <C as TryFrom<usize>>::Error: Debug,
     <L as TryFrom<usize>>::Error: Debug,
@@ -711,7 +711,7 @@ pub fn copy_label_as_attribute<Label>(_x: &[Label], y: Label) -> Result<Label> {
 }
 
 pub struct RCFBuilder<
-    Label: Send + Sync + Copy + 'static,
+    Label: Send + Sync + Copy + Into<Attributes> + 'static,
     Attributes: Send + Sync + Copy + Eq + Hash + 'static,
 > {
     input_dimensions: usize,
@@ -719,8 +719,10 @@ pub struct RCFBuilder<
     pub(crate) rcf_options: RCFOptions<Label, Attributes>,
 }
 
-impl<Label: Send + Sync + Copy + 'static, Attributes: Send + Sync + Copy + Eq + Hash + 'static>
-    RCFBuilder<Label, Attributes>
+impl<
+        Label: Send + Sync + Copy + Into<Attributes> + 'static,
+        Attributes: Send + Sync + Copy + Eq + Hash + 'static,
+    > RCFBuilder<Label, Attributes>
 {
     pub fn new(input_dimensions: usize, shingle_size: usize) -> Self {
         RCFBuilder {
@@ -766,7 +768,7 @@ impl<Label: Send + Sync + Copy + 'static, Attributes: Send + Sync + Copy + Eq + 
         }
     }
 
-    pub fn build_to_u64<Update: Send + Sync + Copy + 'static>(
+    pub fn build_to_u64<Update: Send + Sync + Copy + Into<u64> + 'static>(
         &self,
         attribute_creator: fn(&[Update], Update) -> Result<u64>,
     ) -> Result<Box<dyn AugmentedRCF<Update, u64> + Sync + Send>> {
@@ -830,7 +832,10 @@ impl<Label: Send + Sync + Copy + 'static, Attributes: Send + Sync + Copy + Eq + 
         }
     }
 
-    pub fn build_tiny<Update: Send + Sync + Copy, Operate: Send + Sync + Copy + Eq + Hash>(
+    pub fn build_tiny<
+        Update: Send + Sync + Copy + Into<Operate>,
+        Operate: Send + Sync + Copy + Eq + Hash,
+    >(
         &self,
         attribute_creator: fn(&[Update], Update) -> Result<Operate>,
         attribute_to_vec: Option<fn(&Operate) -> Result<Vec<f32>>>,
@@ -886,7 +891,10 @@ impl<Label: Send + Sync + Copy + 'static, Attributes: Send + Sync + Copy + Eq + 
         self.build_tiny(copy_label_as_attribute::<Operate>, None)
     }
 
-    pub fn build_small<Update: Send + Sync + Copy, Operate: Send + Sync + Copy + Eq + Hash>(
+    pub fn build_small<
+        Update: Send + Sync + Copy + Into<Operate>,
+        Operate: Send + Sync + Copy + Eq + Hash,
+    >(
         &self,
         attribute_creator: fn(&[Update], Update) -> Result<Operate>,
         attribute_to_vec: Option<fn(&Operate) -> Result<Vec<f32>>>,
@@ -937,7 +945,10 @@ impl<Label: Send + Sync + Copy + 'static, Attributes: Send + Sync + Copy + Eq + 
         self.build_small(copy_label_as_attribute::<Operate>, None)
     }
 
-    pub fn build_medium<Update: Send + Sync + Copy, Operate: Send + Sync + Copy + Eq + Hash>(
+    pub fn build_medium<
+        Update: Send + Sync + Copy + Into<Operate>,
+        Operate: Send + Sync + Copy + Eq + Hash,
+    >(
         &self,
         attribute_creator: fn(&[Update], Update) -> Result<Operate>,
         attribute_to_vec: Option<fn(&Operate) -> Result<Vec<f32>>>,
@@ -989,7 +1000,10 @@ impl<Label: Send + Sync + Copy + 'static, Attributes: Send + Sync + Copy + Eq + 
         self.build_medium(copy_label_as_attribute::<Operate>, None)
     }
 
-    pub fn build_large<Update: Send + Sync + Copy, Operate: Send + Sync + Copy + Eq + Hash>(
+    pub fn build_large<
+        Update: Send + Sync + Copy + Into<Operate>,
+        Operate: Send + Sync + Copy + Eq + Hash,
+    >(
         &self,
         attribute_creator: fn(&[Update], Update) -> Result<Operate>,
         attribute_to_vec: Option<fn(&Operate) -> Result<Vec<f32>>>,
@@ -1185,7 +1199,7 @@ pub trait RCFOptionsBuilder<Label: Send + Sync + Copy, Attributes: Send + Sync +
     }
 }
 
-impl<Label: Send + Sync + Copy, Attributes: Send + Sync + Copy + Eq + Hash>
+impl<Label: Send + Sync + Copy + Into<Attributes>, Attributes: Send + Sync + Copy + Eq + Hash>
     RCFOptionsBuilder<Label, Attributes> for RCFBuilder<Label, Attributes>
 {
     fn get_rcf_options(&mut self) -> &mut RCFOptions<Label, Attributes> {

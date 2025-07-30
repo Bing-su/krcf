@@ -4,8 +4,8 @@ use std::cmp::min;
 use std::ops::Index;
 
 use crate::common::cluster::{
-    multi_cluster_as_weighted_ref,
-    single_centroid_cluster_weighted_vec_with_distance_over_slices, Center,
+    multi_cluster_as_weighted_ref, single_centroid_cluster_weighted_vec_with_distance_over_slices,
+    Center,
 };
 
 ///

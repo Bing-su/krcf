@@ -55,7 +55,11 @@ impl Preprocessor {
             || (self.transform_method != NORMALIZE && self.transform_method != NORMALIZE_DIFFERENCE)
     }
 
-    pub fn shingled_point<U: ?Sized, Label: Sync + Copy, Attributes: Sync + Copy>(
+    pub fn shingled_point<
+        U: ?Sized,
+        Label: Sync + Copy + Into<Attributes>,
+        Attributes: Sync + Copy,
+    >(
         &mut self,
         _rcf: Option<&Box<U>>,
         input: &[f32],

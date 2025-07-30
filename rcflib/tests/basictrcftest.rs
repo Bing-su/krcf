@@ -174,9 +174,7 @@ fn trcf_scale(
     let parallel_enabled: bool = false;
     let noise = 5.0;
 
-    println!(
-        "At scale {transform_method}, add spikes? {add_spikes} verbose = {verbose} "
-    );
+    println!("At scale {transform_method}, add spikes? {add_spikes} verbose = {verbose} ");
     let mut trcf: BasicTRCF = BasicTRCFBuilder::new(base_dimension, shingle_size)
         .tree_capacity(capacity)
         .number_of_trees(number_of_trees)
