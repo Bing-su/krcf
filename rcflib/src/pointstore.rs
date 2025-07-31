@@ -298,7 +298,10 @@ where
 
     fn reference_and_offset(&self, index: usize) -> Result<(&[f32], usize)> {
         let base = self.dimensions / self.shingle_size;
-        check_argument(self.reference_count[index] != 0, "index not in use")?;
+        check_argument(
+            index < self.reference_count.len() && self.reference_count[index] != 0,
+            "index not in use",
+        )?;
 
         let locn: usize = self.location[index].try_into().expect("corrupt state");
         let adj_locn = locn * base;
