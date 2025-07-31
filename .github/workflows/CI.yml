@@ -26,7 +26,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cibw-archs: auto64,riscv64
+            cibw-archs: auto64
           - os: ubuntu-24.04-arm
           - os: macos-latest
           - os: windows-latest
@@ -46,7 +46,7 @@ jobs:
 
       - name: Set up CIBW-ARCHS
         if: matrix.cibw-archs
-        run : echo "CIBW_ARCHS=${{ matrix.cibw-archs }}" | save -a $env.GITHUB_ENV
+        run: echo "CIBW_ARCHS=${{ matrix.cibw-archs }}" | save -a $env.GITHUB_ENV
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1
