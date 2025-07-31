@@ -29,11 +29,15 @@ jobs:
             target: aarch64
           - runner: ubuntu-latest
             target: riscv64gc-unknown-linux-gnu
+        python:
+          - "3.x"
+          - "3.13t"
+          - "pypy3.11"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: ${{ matrix.python }}
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -58,16 +62,20 @@ jobs:
             target: aarch64
           - runner: ubuntu-latest
             target: riscv64gc-unknown-linux-musl
+        python:
+          - "3.x"
+          - "3.13t"
+          - "pypy3.11"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: ${{ matrix.python }}
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist --features "pyo3/abi3-py39"
+          args: --release --out dist --zig --features "pyo3/abi3-py39"
           sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
           manylinux: musllinux_1_2
       - name: Upload wheels
@@ -85,11 +93,15 @@ jobs:
             target: x64
           - runner: windows-11-arm
             target: aarch64
+        python:
+          - "3.x"
+          - "3.13t"
+          - "pypy3.11"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: ${{ matrix.python }}
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -109,11 +121,15 @@ jobs:
         platform:
           - runner: macos-latest
             target: aarch64
+        python:
+          - "3.x"
+          - "3.13t"
+          - "pypy3.11"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: ${{ matrix.python }}
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
