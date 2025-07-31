@@ -6,7 +6,7 @@ use crate::util::check_argument;
  * except for discount rate which is useful as initialization from raw scores
  */
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Deviation {
     pub discount: f64,
     pub weight: f64,

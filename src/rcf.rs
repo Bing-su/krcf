@@ -32,8 +32,8 @@ impl Default for PyRCFOptions {
 }
 
 impl PyRCFOptions {
-    pub fn to_rcf_builder(&self) -> RCFBuilder<u64, u64> {
-        let mut options = RCFBuilder::<u64, u64>::new(self.dimensions, self.shingle_size);
+    pub fn to_rcf_builder(&self) -> RCFBuilder {
+        let mut options = RCFBuilder::new(self.dimensions, self.shingle_size);
 
         macro_rules! set_option {
             ($opt:expr, $method:ident) => {
@@ -123,7 +123,7 @@ mod tests {
         };
         let builder = opts.to_rcf_builder();
 
-        let rcf = builder.build();
+        let rcf = builder.build::<u64, u64>();
         assert!(rcf.is_ok());
 
         let rcf = builder.build_large_simple::<u64>();

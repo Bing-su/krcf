@@ -23,6 +23,7 @@ rayon = "*"
 rand = "*"
 rand_chacha = "*"
 rand_core = "*"
+serde = { version = ">=1", features = ["derive"] }
 
 [dev-dependencies]
 parameterized_test = "*"

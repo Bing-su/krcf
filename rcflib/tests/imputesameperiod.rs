@@ -28,7 +28,7 @@ fn impute_same_period() {
     let internal_rotation = false;
     let noise = 5.0;
 
-    let mut forest: Box<dyn RCF> = RCFBuilder::<u64, u64>::new(base_dimension, shingle_size)
+    let mut forest: Box<dyn RCF> = RCFBuilder::new(base_dimension, shingle_size)
         .tree_capacity(capacity)
         .number_of_trees(number_of_trees)
         .random_seed(random_seed)

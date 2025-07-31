@@ -36,7 +36,7 @@ fn two_distribution_test_static() {
     let internal_shingling: bool = false;
     let internal_rotation = false;
 
-    let mut forest = RCFBuilder::<u64, u64>::new(dimensions, shingle_size)
+    let mut forest = RCFBuilder::new(dimensions, shingle_size)
         .tree_capacity(capacity)
         .number_of_trees(number_of_trees)
         .random_seed(random_seed)
@@ -47,10 +47,10 @@ fn two_distribution_test_static() {
         .time_decay(time_decay)
         .initial_accept_fraction(initial_accept_fraction)
         .bounding_box_cache_fraction(bounding_box_cache_fraction)
-        .build()
+        .build::<u64, u64>()
         .unwrap();
 
-    let mut another_forest = RCFBuilder::<u64, u64>::new(dimensions, shingle_size)
+    let mut another_forest = RCFBuilder::new(dimensions, shingle_size)
         .tree_capacity(2 * capacity)
         .number_of_trees(number_of_trees)
         .random_seed(random_seed)
@@ -61,7 +61,7 @@ fn two_distribution_test_static() {
         .time_decay(time_decay)
         .initial_accept_fraction(initial_accept_fraction)
         .bounding_box_cache_fraction(bounding_box_cache_fraction)
-        .build()
+        .build::<u64, u64>()
         .unwrap();
 
     for i in 0..data_with_key.data.len() {

@@ -209,6 +209,7 @@ pub trait AugmentedRCF<Label, Attributes> {
 pub trait RCF: AugmentedRCF<u64, u64> + Send + Sync {}
 impl<U> RCF for U where U: AugmentedRCF<u64, u64> + Send + Sync {}
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RCFStruct<C, L, P, N, Label, Attributes>
 where
     C: Location,
@@ -276,8 +277,7 @@ where
         initial_accept_fraction: f64,
         bounding_box_cache_fraction: f64,
         output_after: usize,
-        attribute_creator: fn(&[Label], Label) -> Result<Attributes>,
-        attribute_to_vec: Option<fn(&Attributes) -> Result<Vec<f32>>>,
+        // attribute_creator, attribute_to_vec 제거
     ) -> Result<Self> {
         let mut point_store_capacity = capacity * number_of_trees + 1;
         if point_store_capacity < 2 * capacity {
@@ -333,8 +333,6 @@ where
                 internal_rotation,
                 store_attributes,
                 propagate_attributes,
-                attribute_creator,
-                attribute_to_vec,
             )?,
             internal_shingling,
             internal_rotation,
@@ -458,7 +456,7 @@ pub fn create_rcf(
     initial_accept_fraction: f64,
     bounding_box_cache_fraction: f64,
 ) -> Box<dyn RCF + Sync + Send> {
-    RCFBuilder::<u64, u64>::new(dimensions / shingle_size, shingle_size)
+    RCFBuilder::new(dimensions / shingle_size, shingle_size)
         .tree_capacity(capacity)
         .number_of_trees(number_of_trees)
         .random_seed(random_seed)
@@ -500,7 +498,7 @@ where
     }
 
     fn update(&mut self, point: &[f32], label: Label) -> Result<()> {
-        let (point_index, point_attribute, vector) = self.point_store.add(&point, label)?;
+        let (point_index, point_attribute, _vector) = self.point_store.add(&point, label)?;
         if point_index != usize::MAX {
             let result: Vec<((usize, usize), (usize, usize))> = if self.parallel_enabled {
                 self.sampler_plus_trees
@@ -710,20 +708,13 @@ pub fn copy_label_as_attribute<Label>(_x: &[Label], y: Label) -> Result<Label> {
     Ok(y)
 }
 
-pub struct RCFBuilder<
-    Label: Send + Sync + Copy + Into<Attributes> + 'static,
-    Attributes: Send + Sync + Copy + Eq + Hash + 'static,
-> {
+pub struct RCFBuilder {
     input_dimensions: usize,
     shingle_size: usize,
-    pub(crate) rcf_options: RCFOptions<Label, Attributes>,
+    pub(crate) rcf_options: RCFOptions,
 }
 
-impl<
-        Label: Send + Sync + Copy + Into<Attributes> + 'static,
-        Attributes: Send + Sync + Copy + Eq + Hash + 'static,
-    > RCFBuilder<Label, Attributes>
-{
+impl RCFBuilder {
     pub fn new(input_dimensions: usize, shingle_size: usize) -> Self {
         RCFBuilder {
             input_dimensions,
@@ -741,15 +732,6 @@ impl<
 
     // coresion reasons
     pub fn build_default(&self) -> Result<Box<dyn RCF + Sync + Send>> {
-        check_argument(
-            self.rcf_options.attribute_to_vec.is_none(),
-            "remove function options for default",
-        )?;
-        check_argument(
-            self.rcf_options.attribute_creator.is_none(),
-            "remove function options fro default",
-        )?;
-
         let x = self.build_tiny_simple::<u64>();
         if x.is_ok() {
             Ok(Box::new(x?))
@@ -770,63 +752,44 @@ impl<
 
     pub fn build_to_u64<Update: Send + Sync + Copy + Into<u64> + 'static>(
         &self,
-        attribute_creator: fn(&[Update], Update) -> Result<u64>,
     ) -> Result<Box<dyn AugmentedRCF<Update, u64> + Sync + Send>> {
-        let x = self.build_tiny::<Update, u64>(attribute_creator, None);
+        let x = self.build_tiny::<Update, u64>();
         if x.is_ok() {
             Ok(Box::new(x?))
         } else {
-            let y = self.build_small::<Update, u64>(attribute_creator, None);
+            let y = self.build_small::<Update, u64>();
             if y.is_ok() {
                 Ok(Box::new(y?))
             } else {
-                let z = self.build_medium::<Update, u64>(attribute_creator, None);
+                let z = self.build_medium::<Update, u64>();
                 if z.is_ok() {
                     Ok(Box::new(z?))
                 } else {
-                    Ok(Box::new(
-                        self.build_large::<Update, u64>(attribute_creator, None)?,
-                    ))
+                    Ok(Box::new(self.build_large::<Update, u64>()?))
                 }
             }
         }
     }
 
-    pub fn build(
+    pub fn build<
+        Label: Send + Sync + Copy + Into<Attributes> + 'static,
+        Attributes: Send + Sync + Copy + Eq + Hash + 'static,
+    >(
         &self,
     ) -> Result<Box<dyn AugmentedRCF<Label, Attributes> + Sync + Send + 'static>> {
-        check_argument(
-            !self.rcf_options.store_attributes || self.rcf_options.attribute_creator.is_some(),
-            "need an attribute_creator function to create the attributes",
-        )?;
-        let attribute_creator = self.rcf_options.attribute_creator.unwrap_or(|x, y| {
-            Err(RCFError::InvalidArgument {
-                msg: "function not provided, should not be invoked",
-            })
-        });
-        let x = self
-            .build_tiny::<Label, Attributes>(attribute_creator, self.rcf_options.attribute_to_vec);
+        let x = self.build_tiny::<Label, Attributes>();
         if x.is_ok() {
             Ok(Box::new(x?))
         } else {
-            let y = self.build_small::<Label, Attributes>(
-                attribute_creator,
-                self.rcf_options.attribute_to_vec,
-            );
+            let y = self.build_small::<Label, Attributes>();
             if y.is_ok() {
                 Ok(Box::new(y?))
             } else {
-                let z = self.build_medium::<Label, Attributes>(
-                    attribute_creator,
-                    self.rcf_options.attribute_to_vec,
-                );
+                let z = self.build_medium::<Label, Attributes>();
                 if z.is_ok() {
                     Ok(Box::new(z?))
                 } else {
-                    Ok(Box::new(self.build_large::<Label, Attributes>(
-                        attribute_creator,
-                        self.rcf_options.attribute_to_vec,
-                    )?))
+                    Ok(Box::new(self.build_large::<Label, Attributes>()?))
                 }
             }
         }
@@ -837,8 +800,7 @@ impl<
         Operate: Send + Sync + Copy + Eq + Hash,
     >(
         &self,
-        attribute_creator: fn(&[Update], Update) -> Result<Operate>,
-        attribute_to_vec: Option<fn(&Operate) -> Result<Vec<f32>>>,
+        // attribute_creator, attribute_to_vec 제거
     ) -> Result<RCFTiny<Update, Operate>> {
         self.validate()?;
         let dimensions = self.input_dimensions * self.shingle_size;
@@ -880,15 +842,15 @@ impl<
             self.rcf_options.initial_accept_fraction,
             self.rcf_options.bounding_box_cache_fraction,
             output_after,
-            attribute_creator,
-            attribute_to_vec,
+            // attribute_creator,
+            // attribute_to_vec,
         )?)
     }
 
     pub fn build_tiny_simple<Operate: Send + Sync + Copy + Eq + Hash>(
         &self,
     ) -> Result<RCFTiny<Operate, Operate>> {
-        self.build_tiny(copy_label_as_attribute::<Operate>, None)
+        self.build_tiny::<Operate, Operate>()
     }
 
     pub fn build_small<
@@ -896,8 +858,7 @@ impl<
         Operate: Send + Sync + Copy + Eq + Hash,
     >(
         &self,
-        attribute_creator: fn(&[Update], Update) -> Result<Operate>,
-        attribute_to_vec: Option<fn(&Operate) -> Result<Vec<f32>>>,
+        // attribute_creator, attribute_to_vec 제거
     ) -> Result<RCFSmall<Update, Operate>> {
         self.validate()?;
         let dimensions = self.input_dimensions * self.shingle_size;
@@ -934,15 +895,13 @@ impl<
             self.rcf_options.initial_accept_fraction,
             self.rcf_options.bounding_box_cache_fraction,
             output_after,
-            attribute_creator,
-            attribute_to_vec,
         )?)
     }
 
     pub fn build_small_simple<Operate: Send + Sync + Copy + Eq + Hash>(
         &self,
     ) -> Result<RCFSmall<Operate, Operate>> {
-        self.build_small(copy_label_as_attribute::<Operate>, None)
+        self.build_small::<Operate, Operate>()
     }
 
     pub fn build_medium<
@@ -950,8 +909,7 @@ impl<
         Operate: Send + Sync + Copy + Eq + Hash,
     >(
         &self,
-        attribute_creator: fn(&[Update], Update) -> Result<Operate>,
-        attribute_to_vec: Option<fn(&Operate) -> Result<Vec<f32>>>,
+        // attribute_creator, attribute_to_vec 제거
     ) -> Result<RCFMedium<Update, Operate>> {
         self.validate()?;
         let dimensions = self.input_dimensions * self.shingle_size;
@@ -989,15 +947,13 @@ impl<
             self.rcf_options.initial_accept_fraction,
             self.rcf_options.bounding_box_cache_fraction,
             output_after,
-            attribute_creator,
-            attribute_to_vec,
         )?)
     }
 
     pub fn build_medium_simple<Operate: Send + Sync + Copy + Eq + Hash>(
         &self,
     ) -> Result<RCFMedium<Operate, Operate>> {
-        self.build_medium(copy_label_as_attribute::<Operate>, None)
+        self.build_medium::<Operate, Operate>()
     }
 
     pub fn build_large<
@@ -1005,8 +961,7 @@ impl<
         Operate: Send + Sync + Copy + Eq + Hash,
     >(
         &self,
-        attribute_creator: fn(&[Update], Update) -> Result<Operate>,
-        attribute_to_vec: Option<fn(&Operate) -> Result<Vec<f32>>>,
+        // attribute_creator, attribute_to_vec 제거
     ) -> Result<RCFLarge<Update, Operate>> {
         self.validate()?;
         let dimensions = self.input_dimensions * self.shingle_size;
@@ -1039,19 +994,17 @@ impl<
             self.rcf_options.initial_accept_fraction,
             self.rcf_options.bounding_box_cache_fraction,
             output_after,
-            attribute_creator,
-            attribute_to_vec,
         )?)
     }
 
     pub fn build_large_simple<Operate: Send + Sync + Copy + Eq + Hash>(
         &self,
     ) -> Result<RCFLarge<Operate, Operate>> {
-        self.build_large(copy_label_as_attribute::<Operate>, None)
+        self.build_large::<Operate, Operate>()
     }
 }
 
-pub struct RCFOptions<Label, Attributes> {
+pub struct RCFOptions {
     pub(crate) id: u64,
     pub(crate) capacity: usize,
     pub(crate) number_of_trees: usize,
@@ -1067,13 +1020,11 @@ pub struct RCFOptions<Label, Attributes> {
     pub(crate) parallel_enabled: bool,
     pub(crate) random_seed: Option<u64>,
     pub(crate) output_after: Option<usize>,
-    pub(crate) attribute_creator: Option<fn(&[Label], Label) -> Result<Attributes>>,
-    pub(crate) attribute_to_vec: Option<fn(&Attributes) -> Result<Vec<f32>>>,
+    // pub(crate) attribute_creator: Option<fn(&[Label], Label) -> Result<Attributes>>,
+    // pub(crate) attribute_to_vec: Option<fn(&Attributes) -> Result<Vec<f32>>>,
 }
 
-impl<Label: Send + Sync + Copy, Attributes: Send + Sync + Copy + Eq + Hash>
-    RCFOptions<Label, Attributes>
-{
+impl RCFOptions {
     pub fn validate(&self) -> Result<()> {
         check_argument(self.capacity > 0, "capacity cannot be 0")?;
         check_argument(self.number_of_trees > 0, "number of trees cannot be 0")?;
@@ -1097,9 +1048,7 @@ impl<Label: Send + Sync + Copy, Attributes: Send + Sync + Copy + Eq + Hash>
     }
 }
 
-impl<Label: Send + Sync + Copy, Attributes: Send + Sync + Copy + Eq + Hash> Default
-    for RCFOptions<Label, Attributes>
-{
+impl Default for RCFOptions {
     fn default() -> Self {
         RCFOptions {
             id: u64::MAX, // a default tag that this was not set
@@ -1117,14 +1066,14 @@ impl<Label: Send + Sync + Copy, Attributes: Send + Sync + Copy + Eq + Hash> Defa
             store_pointsum: false,
             random_seed: None,
             output_after: None,
-            attribute_creator: Option::<fn(&[Label], Label) -> Result<Attributes>>::None,
-            attribute_to_vec: Option::<fn(&Attributes) -> Result<Vec<f32>>>::None,
+            // attribute_creator: Option::<fn(&[Label], Label) -> Result<Attributes>>::None,
+            // attribute_to_vec: Option::<fn(&Attributes) -> Result<Vec<f32>>>::None,
         }
     }
 }
 
-pub trait RCFOptionsBuilder<Label: Send + Sync + Copy, Attributes: Send + Sync + Copy + Eq + Hash> {
-    fn get_rcf_options(&mut self) -> &mut RCFOptions<Label, Attributes>;
+pub trait RCFOptionsBuilder {
+    fn get_rcf_options(&mut self) -> &mut RCFOptions;
 
     fn id(&mut self, id: u64) -> &mut Self {
         self.get_rcf_options().id = id;
@@ -1183,26 +1132,13 @@ pub trait RCFOptionsBuilder<Label: Send + Sync + Copy, Attributes: Send + Sync +
         self.get_rcf_options().time_decay = Some(time_decay);
         self
     }
-    fn attribute_creator(
-        &mut self,
-        function: fn(&[Label], Label) -> Result<Attributes>,
-    ) -> &mut Self {
-        self.get_rcf_options().attribute_creator = Some(function);
-        self
-    }
-    fn attribute_to_vec(
-        &mut self,
-        function: fn(_attribute: &Attributes) -> Result<Vec<f32>>,
-    ) -> &mut Self {
-        self.get_rcf_options().attribute_to_vec = Some(function);
-        self
-    }
+    // attribute_creator, attribute_to_vec 관련 메서드 완전 제거
 }
 
-impl<Label: Send + Sync + Copy + Into<Attributes>, Attributes: Send + Sync + Copy + Eq + Hash>
-    RCFOptionsBuilder<Label, Attributes> for RCFBuilder<Label, Attributes>
-{
-    fn get_rcf_options(&mut self) -> &mut RCFOptions<Label, Attributes> {
+impl RCFOptionsBuilder for RCFBuilder {
+    fn get_rcf_options(&mut self) -> &mut RCFOptions {
         &mut self.rcf_options
     }
+    // attribute_creator, attribute_to_vec 관련 메서드 구현 제거
+    // attribute_creator, attribute_to_vec 제거
 }

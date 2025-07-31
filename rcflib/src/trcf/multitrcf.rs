@@ -218,7 +218,7 @@ pub struct MultiTRCFBuilder {
     arms: usize,
     probability: f32,
     scoring_strategy: ScoringStrategy,
-    rcf_options: RCFOptions<MultiTRCFLabel, u64>,
+    rcf_options: RCFOptions,
     trcf_options: TRCFOptions,
 }
 
@@ -304,7 +304,7 @@ impl MultiTRCFBuilder {
         let mut rcfs = Vec::new();
         for _i in 0..self.arms {
             rcfs.push(
-                RCFBuilder::<MultiTRCFLabel, u64>::new(self.input_dimensions, self.shingle_size)
+                RCFBuilder::new(self.input_dimensions, self.shingle_size)
                     .tree_capacity(self.rcf_options.capacity)
                     .number_of_trees(self.rcf_options.number_of_trees)
                     .time_decay(time_decay)
@@ -313,7 +313,7 @@ impl MultiTRCFBuilder {
                     .initial_accept_fraction(self.rcf_options.initial_accept_fraction)
                     .internal_shingling(false)
                     .random_seed(random_seed)
-                    .build_to_u64(|_x: &[MultiTRCFLabel], y: MultiTRCFLabel| Ok(y.into()))
+                    .build_to_u64()
                     .unwrap(),
             );
             random_seed += 1;
@@ -335,8 +335,8 @@ impl MultiTRCFBuilder {
     }
 }
 
-impl RCFOptionsBuilder<MultiTRCFLabel, u64> for MultiTRCFBuilder {
-    fn get_rcf_options(&mut self) -> &mut RCFOptions<MultiTRCFLabel, u64> {
+impl RCFOptionsBuilder for MultiTRCFBuilder {
+    fn get_rcf_options(&mut self) -> &mut RCFOptions {
         &mut self.rcf_options
     }
 }

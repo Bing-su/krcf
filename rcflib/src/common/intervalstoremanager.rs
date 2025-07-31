@@ -3,6 +3,7 @@ use crate::util::check_argument;
 use std::fmt::Debug;
 
 #[repr(C)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct IntervalStoreManager<T> {
     capacity: usize,
     last_in_use: usize,

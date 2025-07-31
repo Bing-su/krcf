@@ -28,7 +28,7 @@ fn dynamic_density() {
     let internal_shingling: bool = false;
     let internal_rotation = false;
 
-    let mut forest = RCFBuilder::<u64, u64>::new(base_dimension, shingle_size)
+    let mut forest = RCFBuilder::new(base_dimension, shingle_size)
         .tree_capacity(capacity)
         .number_of_trees(number_of_trees)
         .random_seed(random_seed)
@@ -39,7 +39,7 @@ fn dynamic_density() {
         .time_decay(time_decay)
         .initial_accept_fraction(initial_accept_fraction)
         .bounding_box_cache_fraction(bounding_box_cache_fraction)
-        .build()
+        .build::<u64, u64>()
         .unwrap();
 
     let data: Vec<Vec<f32>> = generate_fan(1000, 3);

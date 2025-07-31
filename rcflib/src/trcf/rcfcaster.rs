@@ -122,12 +122,12 @@ pub struct RCFCasterBuilder {
     input_dimensions: usize,
     shingle_size: usize,
     trcf_options: TRCFOptions,
-    rcf_options: RCFOptions<u64, u64>,
+    rcf_options: RCFOptions,
     rcf_caster_options: RCFCasterOptions,
 }
 
-impl RCFOptionsBuilder<u64, u64> for RCFCasterBuilder {
-    fn get_rcf_options(&mut self) -> &mut RCFOptions<u64, u64> {
+impl RCFOptionsBuilder for RCFCasterBuilder {
+    fn get_rcf_options(&mut self) -> &mut RCFOptions {
         &mut self.rcf_options
     }
 }
@@ -193,7 +193,7 @@ impl RCFCasterBuilder {
             .rcf_options
             .random_seed
             .unwrap_or(rand::random::<u64>());
-        let rcf = RCFBuilder::<u64, u64>::new(self.input_dimensions, self.shingle_size)
+        let rcf = RCFBuilder::new(self.input_dimensions, self.shingle_size)
             .tree_capacity(self.rcf_options.capacity)
             .number_of_trees(self.rcf_options.number_of_trees)
             .random_seed(random_seed)

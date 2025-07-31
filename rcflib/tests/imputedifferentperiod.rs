@@ -28,7 +28,7 @@ fn impute_different_period() {
     let internal_rotation = false;
     let noise = 5.0;
 
-    let mut forest = RCFBuilder::<u64, u64>::new(base_dimension, shingle_size)
+    let mut forest = RCFBuilder::new(base_dimension, shingle_size)
         .tree_capacity(capacity)
         .number_of_trees(number_of_trees)
         .random_seed(random_seed)
@@ -39,7 +39,7 @@ fn impute_different_period() {
         .time_decay(time_decay)
         .initial_accept_fraction(initial_accept_fraction)
         .bounding_box_cache_fraction(bounding_box_cache_fraction)
-        .build()
+        .build::<u64, u64>()
         .unwrap();
 
     let mut rng = ChaCha20Rng::seed_from_u64(42);

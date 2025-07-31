@@ -32,6 +32,7 @@ where
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct VectorizedPointStore<L, Label, Attributes>
 where
     L: Location,
@@ -65,8 +66,8 @@ where
     hash_label_counts: HashMap<usize, usize>,
     hash_attribute_counts: HashMap<usize, usize>,
     entries_seen: u64,
-    attribute_creator: fn(_label_shingle: &[Label], _current_label: Label) -> Result<Attributes>,
-    attribute_to_vec: Option<fn(_attribute: &Attributes) -> Result<Vec<f32>>>,
+    // attribute_creator: fn(_label_shingle: &[Label], _current_label: Label) -> Result<Attributes>,
+    // attribute_to_vec: Option<fn(_attribute: &Attributes) -> Result<Vec<f32>>>,
 }
 
 impl<L, Label, Attributes> VectorizedPointStore<L, Label, Attributes>
@@ -86,11 +87,11 @@ where
         internal_rotation: bool,
         store_attributes: bool,
         propagate_attributes: bool,
-        attribute_creator: fn(
-            _label_shingle: &[Label],
-            _current_label: Label,
-        ) -> Result<Attributes>,
-        attribute_to_vec: Option<fn(_attribute: &Attributes) -> Result<Vec<f32>>>,
+        // attribute_creator: fn(
+        //     _label_shingle: &[Label],
+        //     _current_label: Label,
+        // ) -> Result<Attributes>,
+        // attribute_to_vec: Option<fn(_attribute: &Attributes) -> Result<Vec<f32>>>,
     ) -> Result<Self> {
         Ok(VectorizedPointStore {
             internal_shingling,
@@ -118,8 +119,8 @@ where
             attribute_count: Vec::new(),
             label_count: Vec::new(),
             label_shingle: Vec::new(),
-            attribute_creator,
-            attribute_to_vec,
+            // attribute_creator,
+            // attribute_to_vec,
             propagate_attributes,
             attributes: Vec::new(),
         })
@@ -344,7 +345,7 @@ where
 
         let attrib_vec = None;
         let attrib_pos = if self.store_attributes {
-            let new_attribute = (self.attribute_creator)(&self.label_shingle, label)?;
+            let new_attribute: Attributes = label.into();
             let a_pos = *self
                 .attribute_reverse_map
                 .get(&new_attribute)
@@ -621,7 +622,7 @@ where
             self.store_labels && index < self.labels.len() && self.label_count[index] != 0,
             " cannot access the label",
         )?;
-        let (label, attribute_index) = *self.labels.get(&index).expect("unexpected index");
+        let (label, _attribute_index) = *self.labels.get(&index).expect("unexpected index");
         Ok(label)
     }
 
@@ -640,7 +641,7 @@ where
     fn point_sum(&self, list: &[(usize, usize)]) -> Result<Vec<f32>> {
         let mut answer = vec![0.0; self.dimensions];
         for (a, b) in list {
-            let (point, offset) = self.reference_and_offset(*a)?;
+            let (point, _offset) = self.reference_and_offset(*a)?;
             for (x, &y) in answer.iter_mut().zip(point) {
                 *x += y * (*b) as f32;
             }
@@ -656,13 +657,16 @@ where
         } else {
             index
         };
-        if let Some(function) = self.attribute_to_vec {
-            check_argument(index < self.attributes.len(), " out of range")?;
-            (function)(&self.attributes[index])
-        } else {
-            let mut answer = vec![0.0f32; MAX_ATTRIBUTES];
-            answer[y % MAX_ATTRIBUTES] = 1.0;
-            Ok(answer)
-        }
+        // if let Some(function) = self.attribute_to_vec {
+        //     check_argument(index < self.attributes.len(), " out of range")?;
+        //     (function)(&self.attributes[index])
+        // } else {
+        //     let mut answer = vec![0.0f32; MAX_ATTRIBUTES];
+        //     answer[y % MAX_ATTRIBUTES] = 1.0;
+        //     Ok(answer)
+        // }
+        let mut answer = vec![0.0f32; MAX_ATTRIBUTES];
+        answer[y % MAX_ATTRIBUTES] = 1.0;
+        Ok(answer)
     }
 }
