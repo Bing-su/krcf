@@ -210,7 +210,7 @@ impl RandomCutForest {
 
     fn __repr__(&self) -> String {
         format!(
-            "RandomCutForest(dimensions={}, shingle_size={}, num_trees={:?}, sample_size={:?}, output_after={:?}, random_seed={:?}, parallel_execution_enabled={:?}, lambda={:?})",
+            "RandomCutForest(dimensions={}, shingle_size={}, num_trees={:?}, sample_size={:?}, output_after={:?}, random_seed={:?}, parallel_execution_enabled={:?}, lambda={:?}, is_output_ready={}, entries_seen={})",
             self.options.dimensions,
             self.options.shingle_size,
             self.options.num_trees,
@@ -218,7 +218,9 @@ impl RandomCutForest {
             self.options.output_after,
             self.options.random_seed,
             self.options.parallel_execution_enabled,
-            self.options.lambda
+            self.options.lambda,
+            self.rcf.is_output_ready(),
+            self.rcf.entries_seen(),
         )
     }
 
