@@ -8,9 +8,11 @@ classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
+keywords = ["random cut forest", "rcf", "anomaly detection"]
 dynamic = ["version"]
-dependencies = []
+dependencies = ["typing-extensions; python_version < '3.11'"]
 
 [dependency-groups]
 dev = ["ruff"]
