@@ -18,150 +18,75 @@ permissions:
   contents: read
 
 jobs:
-  linux:
-    runs-on: ${{ matrix.platform.runner }}
+  wheel:
+    name: Build Wheel
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        platform:
-          - runner: ubuntu-latest
-            target: x86_64
-          - runner: ubuntu-24.04-arm
-            target: aarch64
-          - runner: ubuntu-latest
-            target: riscv64gc-unknown-linux-gnu
-        python:
-          - "3.x"
-          - "3.13t"
-          - "pypy3.11"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Build wheels
-        uses: PyO3/maturin-action@v1
-        with:
-          target: ${{ matrix.platform.target }}
-          args: --release --out dist --features "pyo3/abi3-py39"
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
-          manylinux: auto
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-linux-${{ matrix.platform.target }}
-          path: dist
+        include:
+          - os: ubuntu-latest
+            cibw-archs: auto64,riscv64
+          - os: ubuntu-24.04-arm
+          - os: macos-latest
+          - os: windows-latest
+          - os: windows-11-arm
 
-  musllinux:
-    runs-on: ${{ matrix.platform.runner }}
-    strategy:
-      matrix:
-        platform:
-          - runner: ubuntu-latest
-            target: x86_64
-          - runner: ubuntu-24.04-arm
-            target: aarch64
-          - runner: ubuntu-latest
-            target: riscv64gc-unknown-linux-musl
-        python:
-          - "3.x"
-          - "3.13t"
-          - "pypy3.11"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Build wheels
-        uses: PyO3/maturin-action@v1
-        with:
-          target: ${{ matrix.platform.target }}
-          args: --release --out dist --zig --features "pyo3/abi3-py39"
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
-          manylinux: musllinux_1_2
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-musllinux-${{ matrix.platform.target }}
-          path: dist
+    defaults:
+      run:
+        shell: nu {0}
 
-  windows:
-    runs-on: ${{ matrix.platform.runner }}
-    strategy:
-      matrix:
-        platform:
-          - runner: windows-latest
-            target: x64
-          - runner: windows-11-arm
-            target: aarch64
-        python:
-          - "3.x"
-          - "3.13t"
-          - "pypy3.11"
     steps:
+      - uses: hustcer/setup-nu@v3
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Build wheels
-        uses: PyO3/maturin-action@v1
-        with:
-          target: ${{ matrix.platform.target }}
-          args: --release --out dist --features "pyo3/abi3-py39"
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-windows-${{ matrix.platform.target }}
-          path: dist
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: docker/setup-qemu-action@v3
+        if: runner.os == 'Linux'
+      - uses: astral-sh/setup-uv@v6
 
-  macos:
-    runs-on: ${{ matrix.platform.runner }}
-    strategy:
-      matrix:
-        platform:
-          - runner: macos-latest
-            target: aarch64
-        python:
-          - "3.x"
-          - "3.13t"
-          - "pypy3.11"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
+      - name: Set up CIBW-ARCHS
+        if: matrix.cibw-archs
+        run : echo "CIBW_ARCHS=${{ matrix.cibw-archs }}" | save -a $env.GITHUB_ENV
+
       - name: Build wheels
-        uses: PyO3/maturin-action@v1
+        uses: pypa/cibuildwheel@v3.1
+
+      - run: ls wheelhouse
+
+      - uses: actions/upload-artifact@v4
         with:
-          target: ${{ matrix.platform.target }}
-          args: --release --out dist --features "pyo3/abi3-py39"
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-macos-${{ matrix.platform.target }}
-          path: dist
+          name: wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
+          if-no-files-found: error
 
   sdist:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: nu {0}
     steps:
+      - uses: hustcer/setup-nu@v3
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v6
+
       - name: Build sdist
-        uses: PyO3/maturin-action@v1
+        run: uv build --sdist
+
+      - run: ls dist
+
+      - uses: actions/upload-artifact@v4
         with:
-          command: sdist
-          args: --out dist
-      - name: Upload sdist
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-sdist
-          path: dist
+          name: sdist
+          path: ./dist/*.tar.gz
+          if-no-files-found: error
 
   release:
     name: Release
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
-    needs: [linux, musllinux, windows, macos, sdist]
+    needs: [wheel, sdist]
+    environment: publish
     permissions:
       # Use to sign the release artifacts
       id-token: write
