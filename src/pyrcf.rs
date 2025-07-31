@@ -68,15 +68,22 @@ impl From<directionaldensity::InterpolationMeasure> for InterpolationMeasure {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, FromPyObject)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, FromPyObject, IntoPyObject)]
+#[pyo3(from_item_all)]
 pub struct RandomCutForestOptions {
     pub dimensions: usize,
     pub shingle_size: usize,
+    #[pyo3(default)]
     pub num_trees: Option<usize>,
+    #[pyo3(default)]
     pub sample_size: Option<usize>,
+    #[pyo3(default)]
     pub output_after: Option<usize>,
+    #[pyo3(default)]
     pub random_seed: Option<u64>,
+    #[pyo3(default)]
     pub parallel_execution_enabled: Option<bool>,
+    #[pyo3(default)]
     pub lambda: Option<f64>,
 }
 
@@ -95,57 +102,74 @@ impl RandomCutForestOptions {
     }
 }
 
-#[pyclass]
+impl Default for RandomCutForestOptions {
+    fn default() -> Self {
+        Self {
+            dimensions: 1,
+            shingle_size: 1,
+            num_trees: None,
+            sample_size: None,
+            output_after: None,
+            random_seed: None,
+            parallel_execution_enabled: None,
+            lambda: None,
+        }
+    }
+}
+
+#[pyclass(module = "krcf")]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RandomCutForest {
     pub rcf: rcf::RandomCutForest,
-    options: RandomCutForestOptions,
+    pub options: RandomCutForestOptions,
 }
 
+#[pymethods]
 impl RandomCutForest {
+    #[new]
     pub fn new(options: RandomCutForestOptions) -> Result<Self> {
         let rcf = rcf::RandomCutForest::new(options.to_rcf_options())?;
         Ok(Self { rcf, options })
     }
 
-    pub fn shingled_point(&self, point: &[f32]) -> Result<Vec<f32>> {
-        Ok(self.rcf.shingled_point(point)?)
+    pub fn shingled_point(&self, point: Vec<f32>) -> Result<Vec<f32>> {
+        Ok(self.rcf.shingled_point(&point)?)
     }
 
-    pub fn update(&mut self, point: &[f32]) -> Result<()> {
-        Ok(self.rcf.update(point)?)
+    pub fn update(&mut self, point: Vec<f32>) -> Result<()> {
+        Ok(self.rcf.update(&point)?)
     }
 
-    pub fn score(&self, point: &[f32]) -> Result<f64> {
-        Ok(self.rcf.score(point)?)
+    pub fn score(&self, point: Vec<f32>) -> Result<f64> {
+        Ok(self.rcf.score(&point)?)
     }
 
-    pub fn displacement_score(&self, point: &[f32]) -> Result<f64> {
-        Ok(self.rcf.displacement_score(point)?)
+    pub fn displacement_score(&self, point: Vec<f32>) -> Result<f64> {
+        Ok(self.rcf.displacement_score(&point)?)
     }
 
-    pub fn attribution(&self, point: &[f32]) -> Result<DiVector> {
-        Ok(self.rcf.attribution(point)?.into())
+    pub fn attribution(&self, point: Vec<f32>) -> Result<DiVector> {
+        Ok(self.rcf.attribution(&point)?.into())
     }
 
     pub fn near_neighbor_list(
         &self,
-        point: &[f32],
+        point: Vec<f32>,
         percentile: usize,
     ) -> Result<Vec<(f64, Vec<f32>, f64)>> {
-        Ok(self.rcf.near_neighbor_list(point, percentile)?)
+        Ok(self.rcf.near_neighbor_list(&point, percentile)?)
     }
 
-    pub fn density(&self, point: &[f32]) -> Result<f64> {
-        Ok(self.rcf.density(point)?)
+    pub fn density(&self, point: Vec<f32>) -> Result<f64> {
+        Ok(self.rcf.density(&point)?)
     }
 
-    pub fn directional_density(&self, point: &[f32]) -> Result<DiVector> {
-        Ok(self.rcf.directional_density(point)?.into())
+    pub fn directional_density(&self, point: Vec<f32>) -> Result<DiVector> {
+        Ok(self.rcf.directional_density(&point)?.into())
     }
 
-    pub fn density_interpolant(&self, point: &[f32]) -> Result<InterpolationMeasure> {
-        Ok(self.rcf.density_interpolant(point)?.into())
+    pub fn density_interpolant(&self, point: Vec<f32>) -> Result<InterpolationMeasure> {
+        Ok(self.rcf.density_interpolant(&point)?.into())
     }
 
     pub fn extrapolate(&self, look_ahead: usize) -> Result<RangeVector> {
@@ -171,22 +195,52 @@ impl RandomCutForest {
     pub fn entries_seen(&self) -> u64 {
         self.rcf.entries_seen()
     }
+    // ------------ Serialization Methods ------------
+
+    pub fn to_json(&self) -> Result<String> {
+        Ok(serde_json::to_string(self)?)
+    }
+
+    #[classmethod]
+    pub fn from_json(_cls: &Bound<'_, pyo3::types::PyType>, string: String) -> Result<Self> {
+        Ok(serde_json::from_str(&string)?)
+    }
 
     // ------------ Python Magic Methods ------------
 
-    pub fn __repr__(&self) -> String {
-        format!("{:?}", self)
+    fn __repr__(&self) -> String {
+        format!(
+            "RandomCutForest(dimensions={}, shingle_size={}, num_trees={:?}, sample_size={:?}, output_after={:?}, random_seed={:?}, parallel_execution_enabled={:?}, lambda={:?})",
+            self.options.dimensions,
+            self.options.shingle_size,
+            self.options.num_trees,
+            self.options.sample_size,
+            self.options.output_after,
+            self.options.random_seed,
+            self.options.parallel_execution_enabled,
+            self.options.lambda
+        )
     }
 
-    pub fn __copy__(&self) -> Self {
+    fn __copy__(&self) -> Self {
         self.clone()
     }
 
-    pub fn __deepcopy__(&self, _memo: Option<&PyAny>) -> Self {
+    fn __deepcopy__(&self, _memo: &Bound<'_, PyAny>) -> Self {
         self.clone()
     }
 
-    pub fn __getnewargs__(&self) -> (RandomCutForestOptions,) {
+    fn __getnewargs__(&self) -> (RandomCutForestOptions,) {
         (self.options.clone(),)
+    }
+
+    fn __getstate__(&self) -> Result<String> {
+        Ok(serde_json::to_string(&self)?)
+    }
+
+    fn __setstate__(&mut self, state: String) -> Result<()> {
+        let deserialized: Self = serde_json::from_str(&state)?;
+        *self = deserialized;
+        Ok(())
     }
 }
