@@ -68,6 +68,23 @@ impl From<directionaldensity::InterpolationMeasure> for InterpolationMeasure {
     }
 }
 
+#[derive(IntoPyObject)]
+pub struct NearNeighbor {
+    pub score: f64,
+    pub point: Vec<f32>,
+    pub distance: f64,
+}
+
+impl From<(f64, Vec<f32>, f64)> for NearNeighbor {
+    fn from(tuple: (f64, Vec<f32>, f64)) -> Self {
+        Self {
+            score: tuple.0,
+            point: tuple.1,
+            distance: tuple.2,
+        }
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, FromPyObject, IntoPyObject)]
 #[pyo3(from_item_all)]
 pub struct RandomCutForestOptions {
@@ -156,8 +173,9 @@ impl RandomCutForest {
         &self,
         point: Vec<f32>,
         percentile: usize,
-    ) -> Result<Vec<(f64, Vec<f32>, f64)>> {
-        Ok(self.rcf.near_neighbor_list(&point, percentile)?)
+    ) -> Result<Vec<NearNeighbor>> {
+        let list = self.rcf.near_neighbor_list(&point, percentile)?;
+        Ok(list.into_iter().map(NearNeighbor::from).collect())
     }
 
     pub fn density(&self, point: Vec<f32>) -> Result<f64> {
