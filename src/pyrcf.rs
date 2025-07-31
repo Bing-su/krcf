@@ -202,8 +202,17 @@ impl RandomCutForest {
     }
 
     #[classmethod]
-    pub fn from_json(_cls: &Bound<'_, pyo3::types::PyType>, string: String) -> Result<Self> {
-        Ok(serde_json::from_str(&string)?)
+    pub fn from_json(_cls: &Bound<'_, pyo3::types::PyType>, value: String) -> Result<Self> {
+        Ok(serde_json::from_str(&value)?)
+    }
+
+    pub fn to_msgpack(&self) -> Result<Vec<u8>> {
+        Ok(rmp_serde::to_vec(self)?)
+    }
+
+    #[classmethod]
+    pub fn from_msgpack(_cls: &Bound<'_, pyo3::types::PyType>, value: Vec<u8>) -> Result<Self> {
+        Ok(rmp_serde::from_slice(&value)?)
     }
 
     // ------------ Python Magic Methods ------------
@@ -236,13 +245,12 @@ impl RandomCutForest {
         (self.options.clone(),)
     }
 
-    fn __getstate__(&self) -> Result<String> {
-        Ok(serde_json::to_string(&self)?)
+    fn __getstate__(&self) -> Result<Vec<u8>> {
+        Ok(rmp_serde::to_vec(&self)?)
     }
 
-    fn __setstate__(&mut self, state: String) -> Result<()> {
-        let deserialized: Self = serde_json::from_str(&state)?;
-        *self = deserialized;
+    fn __setstate__(&mut self, state: Vec<u8>) -> Result<()> {
+        *self = rmp_serde::from_slice(&state)?;
         Ok(())
     }
 }
