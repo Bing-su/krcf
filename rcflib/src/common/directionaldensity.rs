@@ -3,7 +3,7 @@ use crate::util::check_argument;
 use crate::{common::divector::DiVector, samplerplustree::boundingbox::BoundingBox};
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct InterpolationMeasure {
     pub measure: DiVector,
     pub distance: DiVector,

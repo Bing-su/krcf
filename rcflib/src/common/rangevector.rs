@@ -6,7 +6,7 @@ use crate::util::check_argument;
  * lower bounds
  */
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RangeVector<T> {
     pub values: Vec<T>,
     pub upper: Vec<T>,

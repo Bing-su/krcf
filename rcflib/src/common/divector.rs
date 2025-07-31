@@ -3,7 +3,7 @@ use crate::types::Result;
 use crate::util::check_argument;
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DiVector {
     pub high: Vec<f64>,
     pub low: Vec<f64>,
