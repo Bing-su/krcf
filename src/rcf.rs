@@ -7,7 +7,7 @@ use rcflib::{
 };
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-struct RandomCutForestOptions {
+pub struct RandomCutForestOptions {
     pub dimensions: usize,
     pub shingle_size: usize,
     pub num_trees: Option<usize>,
@@ -62,7 +62,7 @@ impl RandomCutForestOptions {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-struct RandomCutForest(RCFLarge<u64, u64>);
+pub struct RandomCutForest(RCFLarge<u64, u64>);
 
 impl RandomCutForest {
     pub fn new(options: RandomCutForestOptions) -> Result<Self, RCFError> {

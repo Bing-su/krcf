@@ -9,7 +9,12 @@ name = "krcf"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "*", features = ["extension-module", "generate-import-lib"] }
+anyhow = ">=1"
+pyo3 = { version = "*", features = [
+    "extension-module",
+    "generate-import-lib",
+    "anyhow",
+] }
 rcf = { path = "./rcflib" }
 serde = { version = ">=1.0", features = ["derive"] }
 serde_json = ">=1.0"
