@@ -10,12 +10,20 @@ use rcflib::{
 pub struct RandomCutForestOptions {
     pub dimensions: usize,
     pub shingle_size: usize,
+    pub id: Option<u64>,
     pub num_trees: Option<usize>,
     pub sample_size: Option<usize>,
     pub output_after: Option<usize>,
     pub random_seed: Option<u64>,
     pub parallel_execution_enabled: Option<bool>,
     pub lambda: Option<f64>,
+    pub internal_rotation: Option<bool>,
+    pub internal_shingling: Option<bool>,
+    pub propagate_attribute_vectors: Option<bool>,
+    pub store_pointsum: Option<bool>,
+    pub store_attributes: Option<bool>,
+    pub initial_accept_fraction: Option<f64>,
+    pub bounding_box_cache_fraction: Option<f64>,
 }
 
 impl Default for RandomCutForestOptions {
@@ -23,12 +31,20 @@ impl Default for RandomCutForestOptions {
         Self {
             dimensions: 1,
             shingle_size: 1,
+            id: None,
             num_trees: None,
             sample_size: None,
             output_after: None,
             random_seed: None,
             parallel_execution_enabled: None,
             lambda: None,
+            internal_rotation: None,
+            internal_shingling: None,
+            propagate_attribute_vectors: None,
+            store_pointsum: None,
+            store_attributes: None,
+            initial_accept_fraction: None,
+            bounding_box_cache_fraction: None,
         }
     }
 }
@@ -45,6 +61,7 @@ impl RandomCutForestOptions {
             };
         }
 
+        set_option!(self.id, id);
         set_option!(self.num_trees, number_of_trees);
         set_option!(self.sample_size, tree_capacity);
         set_option!(self.output_after, output_after);
@@ -52,7 +69,20 @@ impl RandomCutForestOptions {
         set_option!(self.parallel_execution_enabled, parallel_enabled);
         set_option!(self.lambda, time_decay);
 
-        options.internal_shingling(true).store_pointsum(true);
+        set_option!(self.internal_rotation, internal_rotation);
+        set_option!(self.internal_shingling, internal_shingling);
+        set_option!(
+            self.propagate_attribute_vectors,
+            propagate_attribute_vectors
+        );
+        set_option!(self.store_pointsum, store_pointsum);
+        set_option!(self.store_attributes, store_attributes);
+        set_option!(self.initial_accept_fraction, initial_accept_fraction);
+        set_option!(
+            self.bounding_box_cache_fraction,
+            bounding_box_cache_fraction
+        );
+
         options
     }
 
@@ -163,6 +193,7 @@ mod tests {
             random_seed: Some(42),
             parallel_execution_enabled: Some(true),
             lambda: Some(0.01),
+            ..Default::default()
         };
         let builder = opts.to_rcf_builder();
 
@@ -180,10 +211,7 @@ mod tests {
             shingle_size: 1,
             num_trees: Some(10),
             sample_size: Some(32),
-            output_after: None,
-            random_seed: None,
-            parallel_execution_enabled: None,
-            lambda: None,
+            ..Default::default()
         };
         let rcf = opts.to_rcf();
         assert!(rcf.is_ok());
@@ -212,10 +240,7 @@ mod tests {
             shingle_size: 1,
             num_trees: Some(10),
             sample_size: Some(32),
-            output_after: None,
-            random_seed: None,
-            parallel_execution_enabled: None,
-            lambda: None,
+            ..Default::default()
         };
         let mut rcf = RandomCutForest::new(opts).unwrap();
         let point = vec![1.0, 2.0];

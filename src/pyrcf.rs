@@ -91,6 +91,8 @@ pub struct RandomCutForestOptions {
     pub dimensions: usize,
     pub shingle_size: usize,
     #[pyo3(default)]
+    pub id: Option<u64>,
+    #[pyo3(default)]
     pub num_trees: Option<usize>,
     #[pyo3(default)]
     pub sample_size: Option<usize>,
@@ -102,6 +104,20 @@ pub struct RandomCutForestOptions {
     pub parallel_execution_enabled: Option<bool>,
     #[pyo3(default)]
     pub lambda: Option<f64>,
+    #[pyo3(default)]
+    pub internal_rotation: Option<bool>,
+    #[pyo3(default)]
+    pub internal_shingling: Option<bool>,
+    #[pyo3(default)]
+    pub propagate_attribute_vectors: Option<bool>,
+    #[pyo3(default)]
+    pub store_pointsum: Option<bool>,
+    #[pyo3(default)]
+    pub store_attributes: Option<bool>,
+    #[pyo3(default)]
+    pub initial_accept_fraction: Option<f64>,
+    #[pyo3(default)]
+    pub bounding_box_cache_fraction: Option<f64>,
 }
 
 impl RandomCutForestOptions {
@@ -109,12 +125,20 @@ impl RandomCutForestOptions {
         rcf::RandomCutForestOptions {
             dimensions: self.dimensions,
             shingle_size: self.shingle_size,
+            id: self.id,
             num_trees: self.num_trees,
             sample_size: self.sample_size,
             output_after: self.output_after,
             random_seed: self.random_seed,
             parallel_execution_enabled: self.parallel_execution_enabled,
             lambda: self.lambda,
+            internal_rotation: self.internal_rotation,
+            internal_shingling: self.internal_shingling,
+            propagate_attribute_vectors: self.propagate_attribute_vectors,
+            store_pointsum: self.store_pointsum,
+            store_attributes: self.store_attributes,
+            initial_accept_fraction: self.initial_accept_fraction,
+            bounding_box_cache_fraction: self.bounding_box_cache_fraction,
         }
     }
 }
@@ -124,12 +148,20 @@ impl Default for RandomCutForestOptions {
         Self {
             dimensions: 1,
             shingle_size: 1,
+            id: None,
             num_trees: None,
             sample_size: None,
             output_after: None,
             random_seed: None,
             parallel_execution_enabled: None,
             lambda: None,
+            internal_rotation: None,
+            internal_shingling: None,
+            propagate_attribute_vectors: None,
+            store_pointsum: None,
+            store_attributes: None,
+            initial_accept_fraction: None,
+            bounding_box_cache_fraction: None,
         }
     }
 }
