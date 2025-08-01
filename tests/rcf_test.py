@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pickle
 import platform
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 import jsonpickle
@@ -203,3 +204,27 @@ def test_rcf_pickle(options: RandomCutForestOptions, module: Any):
     assert score1 == score2
     assert forest.is_output_ready() == deserialized.is_output_ready()
     assert forest.entries_seen() == deserialized.entries_seen()
+
+
+@pytest.mark.parametrize("parallel", [True, False])
+def test_rcf_thread_safety(parallel: bool):  # noqa: FBT001
+    dim = 10
+    shingle_size = 4
+    options: RandomCutForestOptions = {
+        "dimensions": dim,
+        "shingle_size": shingle_size,
+        "output_after": 1,
+        "parallel_execution_enabled": parallel,
+    }
+
+    forest = RandomCutForest(options)
+
+    pp = np.random.random((200, dim))
+    with ThreadPoolExecutor() as executor:
+        for point in pp:
+            executor.submit(forest.update, point)
+
+    anomaly = np.random.random(dim) * 10**9
+    score = forest.score(anomaly.tolist())
+    assert isinstance(score, float)
+    assert score >= 2
