@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pickle
+import platform
 from typing import Any
 
 import jsonpickle
@@ -180,6 +181,10 @@ def test_rcf_with_options(options: RandomCutForestOptions, data: st.DataObject):
 )
 @settings(deadline=None, max_examples=30)
 @pytest.mark.parametrize("module", [pickle, jsonpickle])
+@pytest.mark.xfail(
+    platform.python_implementation() == "PyPy",
+    reason="pypy + jsonpickle error",
+)
 def test_rcf_pickle(options: RandomCutForestOptions, module: Any):
     forest = RandomCutForest(options)
     dim = options["dimensions"]
