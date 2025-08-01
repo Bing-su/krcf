@@ -166,7 +166,7 @@ impl Default for RandomCutForestOptions {
     }
 }
 
-#[pyclass(module = "krcf")]
+#[pyclass(module = "krcf.krcf", str)]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RandomCutForest {
     pub rcf: rcf::RandomCutForest,
@@ -268,19 +268,7 @@ impl RandomCutForest {
     // ------------ Python Magic Methods ------------
 
     fn __repr__(&self) -> String {
-        format!(
-            "RandomCutForest(dimensions={}, shingle_size={}, num_trees={:?}, sample_size={:?}, output_after={:?}, random_seed={:?}, parallel_execution_enabled={:?}, lambda={:?}, is_output_ready={}, entries_seen={})",
-            self.options.dimensions,
-            self.options.shingle_size,
-            self.options.num_trees,
-            self.options.sample_size,
-            self.options.output_after,
-            self.options.random_seed,
-            self.options.parallel_execution_enabled,
-            self.options.lambda,
-            self.rcf.is_output_ready(),
-            self.rcf.entries_seen(),
-        )
+        self.to_string()
     }
 
     fn __copy__(&self) -> Self {
@@ -302,5 +290,24 @@ impl RandomCutForest {
     fn __setstate__(&mut self, state: Vec<u8>) -> Result<()> {
         *self = rmp_serde::from_slice(&state)?;
         Ok(())
+    }
+}
+
+impl std::fmt::Display for RandomCutForest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "RandomCutForest(dimensions={}, shingle_size={}, num_trees={:?}, sample_size={:?}, output_after={:?}, random_seed={:?}, parallel_execution_enabled={:?}, lambda={:?}, is_output_ready={}, entries_seen={})",
+            self.options.dimensions,
+            self.options.shingle_size,
+            self.options.num_trees,
+            self.options.sample_size,
+            self.options.output_after,
+            self.options.random_seed,
+            self.options.parallel_execution_enabled,
+            self.options.lambda,
+            self.rcf.is_output_ready(),
+            self.rcf.entries_seen(),
+        )
     }
 }
