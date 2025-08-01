@@ -15,14 +15,15 @@ dynamic = ["version"]
 dependencies = ["typing-extensions; python_version < '3.11'"]
 
 [dependency-groups]
-dev = ["ruff"]
+dev = ["ruff", "typing-extensions"]
 test = [
-    "pytest",
+    "hypothesis[pytest,numpy]",
     "pytest-pretty",
     "pytest-xdist",
     "pytest-cov",
     "hypothesis",
     "syrupy",
+    "jsonpickle",
 ]
 
 [build-system]
@@ -73,6 +74,9 @@ ignore = ["B905", "E501", "PLR2004"]
 
 [tool.ruff.lint.per-file-ignores]
 "*_test.py" = ["S101"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["krcf"]
 
 [tool.cibuildwheel]
 build-frontend = "build"

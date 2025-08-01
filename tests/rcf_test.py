@@ -1,25 +1,43 @@
-from hypothesis import given
+from __future__ import annotations
+
+import pickle
+from typing import Any
+
+import jsonpickle
+import numpy as np
+import pytest
+from hypothesis import assume, given, settings
 from hypothesis import strategies as st
+from hypothesis.extra.numpy import arrays
+
 from krcf import RandomCutForest, RandomCutForestOptions
 
 
-def list_of_list_floats(size: int) -> st.SearchStrategy[list[list[float]]]:
-    return st.lists(
-        st.lists(
-            st.floats(
-                min_value=-1e6, max_value=1e6, allow_nan=False, allow_infinity=False
+@st.composite
+def points(draw: st.DrawFn, *, dim: int | None = None) -> np.ndarray:
+    if dim is None:
+        dim = draw(st.integers(min_value=1, max_value=20))
+    num_points = draw(st.integers(min_value=1, max_value=100))
+    dtype = draw(st.sampled_from([np.float32, np.float64]))
+    return draw(
+        arrays(
+            dtype,
+            shape=(num_points, dim),
+            elements=st.floats(
+                min_value=-1e9,
+                max_value=1e9,
+                allow_nan=False,
+                allow_infinity=False,
             ),
-            min_size=size,
-            max_size=size,
-        ),
-        min_size=1,
+        )
     )
 
 
-@given(points=list_of_list_floats(10))
-def test_score_with_random_point(points: list[list[float]]):
+@given(points=points())
+def test_score_with_random_point(points: np.ndarray):
+    dim = points.shape[1]
     opts: RandomCutForestOptions = {
-        "dimensions": 10,
+        "dimensions": dim,
         "shingle_size": 2,
         "output_after": 1,
     }
@@ -30,14 +48,14 @@ def test_score_with_random_point(points: list[list[float]]):
     assert isinstance(score, float)
     assert score >= 0
     if forest.is_output_ready():
-        anomaly_score = forest.score([10**9] * 10)
+        anomaly_score = forest.score([10**18] * dim)
         assert isinstance(anomaly_score, float)
         assert anomaly_score >= 1.5
 
 
-@given(points=list_of_list_floats(5))
-def test_attribution_shape(points: list[list[float]]):
-    dim = 5
+@given(points=points())
+def test_attribution_shape(points: np.ndarray):
+    dim = points.shape[1]
     shingle_size = 2
     opts: RandomCutForestOptions = {
         "dimensions": dim,
@@ -53,10 +71,11 @@ def test_attribution_shape(points: list[list[float]]):
     assert len(attr["low"]) == dim * shingle_size
 
 
-@given(points=list_of_list_floats(2))
-def test_density_is_float(points: list[list[float]]):
+@given(points=points())
+def test_density_is_float(points: np.ndarray):
+    dim = points.shape[1]
     opts: RandomCutForestOptions = {
-        "dimensions": 2,
+        "dimensions": dim,
         "shingle_size": 2,
         "output_after": 1,
     }
@@ -68,10 +87,11 @@ def test_density_is_float(points: list[list[float]]):
     assert density >= 0
 
 
-@given(points=list_of_list_floats(5))
-def test_near_neighbor_list(points: list[list[float]]):
+@given(points=points())
+def test_near_neighbor_list(points: np.ndarray):
+    dim = points.shape[1]
     opts: RandomCutForestOptions = {
-        "dimensions": 5,
+        "dimensions": dim,
         "shingle_size": 2,
         "output_after": 1,
     }
@@ -86,3 +106,95 @@ def test_near_neighbor_list(points: list[list[float]]):
     assert isinstance(neighbors, list)
     assert len(neighbors) > 0
     assert sorted(neighbors[0]) == ["distance", "point", "score"]
+
+
+@given(
+    options=st.fixed_dictionaries(
+        {
+            "dimensions": st.integers(min_value=1, max_value=20),
+            "shingle_size": st.integers(min_value=1, max_value=10),
+            "output_after": st.integers(min_value=1, max_value=10),
+            "id": st.integers(min_value=0, max_value=10**18) | st.none(),
+            "random_seed": st.integers(min_value=0, max_value=10**18) | st.none(),
+            "num_trees": st.integers(min_value=1, max_value=100) | st.none(),
+            "sample_size": st.integers(min_value=10, max_value=512) | st.none(),
+            "parallel_execution_enabled": st.booleans() | st.none(),
+            "lambda": st.floats(min_value=0.0, max_value=1.0) | st.none(),
+            "internal_rotation": st.booleans() | st.none(),
+            "internal_shingling": st.just(True) | st.none(),  # noqa: FBT003
+            "propagate_attribute_vectors": st.booleans() | st.none(),
+            "store_pointsum": st.booleans() | st.none(),
+            "store_attributes": st.booleans() | st.none(),
+            "initial_accept_fraction": st.floats(min_value=0.01, max_value=1.0)
+            | st.none(),
+            "bounding_box_cache_fraction": st.floats(min_value=0.0, max_value=1.0)
+            | st.none(),
+        }
+    ),
+    data=st.data(),
+)
+@settings(deadline=None)
+def test_rcf_with_options(options: RandomCutForestOptions, data: st.DataObject):
+    propagate_attribute_vectors = options.get("propagate_attribute_vectors")
+    store_attributes = options.get("store_attributes")
+    assume(
+        not propagate_attribute_vectors
+        or (propagate_attribute_vectors and store_attributes)
+    )
+
+    forest = RandomCutForest(options)
+    dim = options["dimensions"]
+    p = data.draw(points(dim=dim))
+    scores = []
+
+    for point in p:
+        scores.append(forest.score(point))
+        forest.update(point)
+
+    assert all(isinstance(score, float) for score in scores)
+    assert all(score >= 0 for score in scores)
+
+
+@given(
+    options=st.fixed_dictionaries(
+        {
+            "dimensions": st.integers(min_value=1, max_value=20),
+            "shingle_size": st.integers(min_value=1, max_value=10),
+            "output_after": st.integers(min_value=1, max_value=10),
+            "id": st.integers(min_value=0, max_value=10**18) | st.none(),
+            "random_seed": st.integers(min_value=0, max_value=10**18),
+            "num_trees": st.integers(min_value=1, max_value=50) | st.none(),
+            "sample_size": st.integers(min_value=10, max_value=256) | st.none(),
+            "parallel_execution_enabled": st.booleans() | st.none(),
+            "lambda": st.floats(min_value=0.0, max_value=1.0) | st.none(),
+            "internal_rotation": st.booleans() | st.none(),
+            "internal_shingling": st.just(True) | st.none(),  # noqa: FBT003
+            "store_pointsum": st.booleans() | st.none(),
+            "store_attributes": st.booleans() | st.none(),
+            "initial_accept_fraction": st.floats(min_value=0.01, max_value=1.0)
+            | st.none(),
+            "bounding_box_cache_fraction": st.floats(min_value=0.0, max_value=1.0)
+            | st.none(),
+        }
+    ),
+)
+@settings(deadline=None, max_examples=30)
+@pytest.mark.parametrize("module", [pickle, jsonpickle])
+def test_rcf_pickle(options: RandomCutForestOptions, module: Any):
+    forest = RandomCutForest(options)
+    dim = options["dimensions"]
+    rng = np.random.default_rng(options.get("random_seed", 0))
+    p = rng.random(((options.get("output_after") or 1) * 2, dim))
+
+    for point in p:
+        forest.update(point)
+
+    serialized = module.dumps(forest)
+    deserialized = module.loads(serialized)
+
+    score1 = forest.score(p[0])
+    score2 = deserialized.score(p[0])
+
+    assert score1 == score2
+    assert forest.is_output_ready() == deserialized.is_output_ready()
+    assert forest.entries_seen() == deserialized.entries_seen()
