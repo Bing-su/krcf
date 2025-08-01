@@ -59,6 +59,44 @@ jobs:
           path: ./wheelhouse/*.whl
           if-no-files-found: error
 
+  wheel-riscv64:
+    name: Build Wheel riscv64
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: nu {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: riscv64gc-unknown-linux-gnu
+            manylinux: auto
+            args: --out dist
+          - target: riscv64gc-unknown-linux-musl
+            manylinux: musllinux_1_2
+            args: --out dist --zig
+
+    steps:
+      - uses: hustcer/setup-nu@v3
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          target: ${{ matrix.target }}
+
+      - uses: pyo3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux }}
+          args: ${{ matrix.args }}
+
+      - run: ls dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-riscv64-${{ strategy.job-index }}
+          path: ./dist/*.whl
+          if-no-files-found: error
+
   sdist:
     runs-on: ubuntu-latest
     defaults:
@@ -85,7 +123,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
-    needs: [wheel, sdist]
+    needs: [wheel, wheel-riscv64, sdist]
     environment: publish
     permissions:
       # Use to sign the release artifacts
