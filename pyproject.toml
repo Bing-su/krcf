@@ -13,6 +13,7 @@ classifiers = [
 keywords = ["random cut forest", "rcf", "anomaly detection"]
 dynamic = ["version"]
 dependencies = ["typing-extensions; python_version < '3.11'"]
+readme = "README.md"
 
 [dependency-groups]
 dev = ["ruff", "typing-extensions"]
