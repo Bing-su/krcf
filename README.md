@@ -2,14 +2,13 @@
 
 ## Project Description
 
-krcf is a high-performance Python package for anomaly detection and time series analysis, powered by a Rust backend. It implements the Random Cut Forest (RCF) algorithm, which is widely used for identifying anomalies in streaming data and multivariate time series. The package is designed for speed, scalability, and ease of use, making it suitable for both research and production environments.
+Python bindings for the [aws/random-cut-forest-by-aws](https://github.com/aws/random-cut-forest-by-aws) library, providing a fast and efficient implementation of Random Cut Forests for anomaly detection.
 
 Key features:
 
 - Fast anomaly detection using Random Cut Forests
 - Attribution and scoring for detected anomalies
 - Support for shingling and advanced configuration
-- Pythonic API with type hints
 
 ## API Usage
 

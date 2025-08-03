@@ -1,29 +1,15 @@
+import sys
 from collections.abc import Sequence
-from typing import TypedDict
 
 from .options import RandomCutForestOptions
+from .types import DiVector, InterpolationMeasure, NearNeighbor, RangeVector
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 __version__: str
-
-class DiVector(TypedDict):
-    high: list[float]
-    low: list[float]
-
-class RangeVector(TypedDict):
-    values: list[float]
-    upper: list[float]
-    lower: list[float]
-
-class InterpolationMeasure(TypedDict):
-    measure: DiVector
-    distance: DiVector
-    probability_mass: DiVector
-    sample_size: float
-
-class NearNeighbor(TypedDict):
-    score: float
-    point: list[float]
-    distance: float
 
 class RandomCutForest:
     """
@@ -234,7 +220,7 @@ class RandomCutForest:
             JSON representation of the forest.
         """
     @classmethod
-    def from_json(cls, value: str) -> RandomCutForest:
+    def from_json(cls, value: str) -> Self:
         """
         Deserializes a forest from a JSON string.
 
@@ -258,7 +244,7 @@ class RandomCutForest:
             MessagePack representation of the forest.
         """
     @classmethod
-    def from_msgpack(cls, value: bytes) -> RandomCutForest:
+    def from_msgpack(cls, value: bytes) -> Self:
         """
         Deserializes a forest from a MessagePack byte string.
 
