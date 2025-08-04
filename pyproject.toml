@@ -24,6 +24,9 @@ test = [
     "jsonpickle",
 ]
 
+[project.urls]
+source = "https://github.com/Bing-su/krcf"
+
 [dependency-groups]
 dev = ["ruff", "typing-extensions", "nox[uv]"]
 
