@@ -4,9 +4,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "**/*.py"
+      - "**/*.rs"
   pull_request:
     branches:
       - main
+    paths:
+      - "**/*.py"
+      - "**/*.rs"
   schedule:
     - cron: "0 0 * * 0"
   workflow_dispatch:
