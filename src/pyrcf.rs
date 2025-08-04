@@ -245,6 +245,16 @@ impl RandomCutForest {
     pub fn entries_seen(&self) -> u64 {
         self.rcf.entries_seen()
     }
+
+    pub fn options(&self) -> RandomCutForestOptions {
+        self.options.clone()
+    }
+
+    #[pyo3(name = "clone")]
+    pub fn clone_py(&self) -> Self {
+        self.clone()
+    }
+
     // ------------ Serialization Methods ------------
 
     pub fn to_json(&self) -> Result<String> {

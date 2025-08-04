@@ -258,3 +258,21 @@ class RandomCutForest:
         Self
             Deserialized forest instance.
         """
+    def options(self) -> RandomCutForestOptions:
+        """
+        Returns the options used to create the forest.
+
+        Returns
+        -------
+        RandomCutForestOptions
+            Dictionary containing the Random Cut Forest options.
+        """
+    def clone(self) -> Self:
+        """
+        Returns a clone of the current forest instance.
+
+        Returns
+        -------
+        Self
+            Cloned forest instance.
+        """

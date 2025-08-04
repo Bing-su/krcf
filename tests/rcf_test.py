@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import pickle
 import platform
 from concurrent.futures import ThreadPoolExecutor
@@ -109,6 +110,53 @@ def test_near_neighbor_list(points: np.ndarray):
     assert isinstance(neighbors, list)
     assert len(neighbors) > 0
     assert sorted(neighbors[0]) == ["distance", "point", "score"]
+
+
+def test_options():
+    opts: RandomCutForestOptions = {
+        "dimensions": 5,
+        "shingle_size": 3,
+        "output_after": 256,
+    }
+    forest = RandomCutForest(opts)
+    options = forest.options()
+    for k, v in options.items():
+        if k == "dimensions":
+            assert v == opts["dimensions"]
+        elif k == "shingle_size":
+            assert v == opts["shingle_size"]
+        elif k == "output_after":
+            assert v == opts["output_after"]
+        else:
+            assert v is None, f"Unexpected option {k} with value {v}"
+
+
+def test_to_json():
+    opts: RandomCutForestOptions = {
+        "dimensions": 5,
+        "shingle_size": 3,
+        "output_after": 256,
+        "id": 1000000007,
+    }
+    forest = RandomCutForest(opts)
+    json_str = forest.to_json()
+    assert isinstance(json_str, str)
+
+    json_data = json.loads(json_str)
+    assert isinstance(json_data, dict)
+    assert "options" in json_data
+    assert isinstance(json_data["options"], dict)
+    assert json_data["options"]["dimensions"] == opts["dimensions"]
+    assert json_data["options"]["shingle_size"] == opts["shingle_size"]
+    assert json_data["options"]["output_after"] == opts["output_after"]
+    assert json_data["options"]["id"] == opts["id"]
+
+    assert "rcf" in json_data
+    assert isinstance(json_data["rcf"], dict)
+
+    forest2 = RandomCutForest.from_json(json_str)
+    assert isinstance(forest2, RandomCutForest)
+    assert forest2.options().get("id") == opts["id"]
 
 
 @given(
@@ -234,7 +282,7 @@ def test_rcf_pickle(options: RandomCutForestOptions, module: Any):
     ),
 )
 @settings(deadline=None, max_examples=30)
-@pytest.mark.parametrize("copier", [copy.copy, copy.deepcopy])
+@pytest.mark.parametrize("copier", [copy.copy, copy.deepcopy, RandomCutForest.clone])
 def test_rcf_copy(options: RandomCutForestOptions, copier: Callable[[Any], Any]):
     forest = RandomCutForest(options)
     dim = options["dimensions"]
