@@ -224,13 +224,16 @@ def test_rcf_thread_safety(parallel: bool):  # noqa: FBT001
 
     pp = np.random.random((200, dim))
     scores = []
+    updates = []
     with ThreadPoolExecutor() as executor:
         for point in pp:
-            fut = executor.submit(forest.score, point)
-            scores.append(fut)
-            executor.submit(forest.update, point)
+            fut1 = executor.submit(forest.score, point)
+            scores.append(fut1)
+            fut2 = executor.submit(forest.update, point)
+            updates.append(fut2)
 
     scores = [fut.result() for fut in scores]
+    _ = [fut.result() for fut in updates]
 
     assert all(isinstance(score, float) for score in scores)
     assert all(score >= 0 for score in scores)
