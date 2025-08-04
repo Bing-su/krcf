@@ -205,6 +205,9 @@ def test_rcf_pickle(options: RandomCutForestOptions, module: Any):
     assert forest.is_output_ready() == deserialized.is_output_ready()
     assert forest.entries_seen() == deserialized.entries_seen()
 
+    for point in p:
+        deserialized.update(point)
+
 
 @pytest.mark.parametrize("parallel", [True, False])
 def test_rcf_thread_safety(parallel: bool):  # noqa: FBT001
@@ -220,9 +223,17 @@ def test_rcf_thread_safety(parallel: bool):  # noqa: FBT001
     forest = RandomCutForest(options)
 
     pp = np.random.random((200, dim))
+    scores = []
     with ThreadPoolExecutor() as executor:
         for point in pp:
+            fut = executor.submit(forest.score, point)
+            scores.append(fut)
             executor.submit(forest.update, point)
+
+    scores = [fut.result() for fut in scores]
+
+    assert all(isinstance(score, float) for score in scores)
+    assert all(score >= 0 for score in scores)
 
     anomaly = np.random.random(dim) * 10**9
     score = forest.score(anomaly.tolist())
