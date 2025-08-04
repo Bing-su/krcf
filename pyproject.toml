@@ -15,8 +15,7 @@ dynamic = ["version"]
 dependencies = ["typing-extensions; python_version < '3.11'"]
 readme = "README.md"
 
-[dependency-groups]
-dev = ["ruff", "typing-extensions"]
+[project.optional-dependencies]
 test = [
     "hypothesis[pytest,numpy]",
     "pytest-pretty",
@@ -24,6 +23,9 @@ test = [
     "syrupy",
     "jsonpickle",
 ]
+
+[dependency-groups]
+dev = ["ruff", "typing-extensions", "nox[uv]"]
 
 [build-system]
 requires = ["maturin>=1.9,<2.0"]

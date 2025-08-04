@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import copy
 import pickle
 import platform
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any
+from typing import Any, Callable
 
 import jsonpickle
 import numpy as np
@@ -209,7 +210,57 @@ def test_rcf_pickle(options: RandomCutForestOptions, module: Any):
         deserialized.update(point)
 
 
+@given(
+    options=st.fixed_dictionaries(
+        {
+            "dimensions": st.integers(min_value=1, max_value=20),
+            "shingle_size": st.integers(min_value=1, max_value=10),
+            "output_after": st.integers(min_value=1, max_value=10),
+            "id": st.integers(min_value=0, max_value=10**18) | st.none(),
+            "random_seed": st.integers(min_value=0, max_value=10**18),
+            "num_trees": st.integers(min_value=1, max_value=50) | st.none(),
+            "sample_size": st.integers(min_value=10, max_value=256) | st.none(),
+            "parallel_execution_enabled": st.booleans() | st.none(),
+            "lambda": st.floats(min_value=0.0, max_value=1.0) | st.none(),
+            "internal_rotation": st.booleans() | st.none(),
+            "internal_shingling": st.just(True) | st.none(),  # noqa: FBT003
+            "store_pointsum": st.booleans() | st.none(),
+            "store_attributes": st.booleans() | st.none(),
+            "initial_accept_fraction": st.floats(min_value=0.01, max_value=1.0)
+            | st.none(),
+            "bounding_box_cache_fraction": st.floats(min_value=0.0, max_value=1.0)
+            | st.none(),
+        }
+    ),
+)
+@settings(deadline=None, max_examples=30)
+@pytest.mark.parametrize("copier", [copy.copy, copy.deepcopy])
+def test_rcf_copy(options: RandomCutForestOptions, copier: Callable[[Any], Any]):
+    forest = RandomCutForest(options)
+    dim = options["dimensions"]
+    rng = np.random.default_rng(options.get("random_seed", 0))
+    p = rng.random(((options.get("output_after") or 1) * 2, dim))
+
+    for point in p:
+        forest.update(point)
+
+    copied = copier(forest)
+    score1 = forest.score(p[0])
+    score2 = copied.score(p[0])
+
+    assert score1 == score2
+    assert forest.is_output_ready() == copied.is_output_ready()
+    assert forest.entries_seen() == copied.entries_seen()
+
+    for point in p:
+        copied.update(point)
+
+
 @pytest.mark.parametrize("parallel", [True, False])
+@pytest.mark.xfail(
+    platform.python_implementation() == "PyPy",
+    reason="pypy threading issues",
+)
 def test_rcf_thread_safety(parallel: bool):  # noqa: FBT001
     dim = 10
     shingle_size = 4
