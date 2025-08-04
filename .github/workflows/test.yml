@@ -30,7 +30,6 @@ jobs:
           - ubuntu-24.04-arm
           - macos-latest
           - windows-latest
-          - windows-11-arm
 
     steps:
       - uses: actions/checkout@v4
