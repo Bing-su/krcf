@@ -81,7 +81,7 @@ known-first-party = ["krcf"]
 
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
-test-groups = ["test"]
+test-extras = ["test"]
 test-command = "pytest -n 2 {project}"
 enable = ["cpython-freethreading", "pypy"]
 test-skip = ["cp39-win_arm64", "cp310-win_arm64"]
