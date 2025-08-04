@@ -791,6 +791,7 @@ fn pick_slice_to_slice<'a>(index: usize, entry: &'a [&[f32]]) -> &'a [f32] {
     &entry[index]
 }
 
+#[allow(dead_code)]
 fn pick_first_slice_to_slice<'a>(index: usize, entry: &'a [(&[f32], f32)]) -> &'a [f32] {
     &entry[index].0
 }
@@ -839,6 +840,7 @@ pub fn single_centroid_cluster_weighted_vec_with_distance_over_slices(
     )
 }
 
+#[allow(non_upper_case_globals)]
 const empty_weights: &Vec<f32> = &Vec::new();
 
 pub fn single_centroid_unweighted_cluster_vec_as_slice(
@@ -1148,7 +1150,7 @@ impl<'b, Z, T: ?Sized> IntermediateCluster<Z, &'b T, T> for MultiCenterRef<'b, T
         self.representatives.push(representatives[max_index]);
         representatives.swap_remove(max_index);
 
-        /**
+        /*
          * create a list of representatives based on the farthest point method, which
          * correspond to a well scattered set. See
          * https://en.wikipedia.org/wiki/CURE_algorithm

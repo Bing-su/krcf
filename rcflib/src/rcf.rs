@@ -11,7 +11,6 @@ use rand_core::RngCore;
 use rayon::prelude::*;
 
 use crate::common::rangevector::RangeVector;
-use crate::errors::RCFError;
 use crate::{
     common::{
         conditionalfieldsummarizer::FieldSummarizer, directionaldensity::InterpolationMeasure,
@@ -1011,6 +1010,7 @@ pub struct RCFOptions {
     pub(crate) time_decay: Option<f64>,
     pub(crate) internal_shingling: bool,
     pub(crate) internal_rotation: bool,
+    #[allow(dead_code)]
     pub(crate) store_labels: bool,
     pub(crate) store_attributes: bool,
     pub(crate) propagate_attributes: bool,

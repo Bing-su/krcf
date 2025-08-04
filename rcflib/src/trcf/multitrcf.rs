@@ -10,7 +10,7 @@ use crate::trcf::types::{ScoringStrategy, TransformMethod};
 use crate::types::Result;
 use crate::util::{check_argument, maxf32};
 use rand_chacha::ChaCha20Rng;
-use rand_core::{RngCore, SeedableRng};
+use rand_core::SeedableRng;
 use rayon::prelude::*;
 use std::collections::HashMap;
 
@@ -38,6 +38,7 @@ pub struct MultiTRCF {
     transform_decay: f64,
     transform_method: TransformMethod,
     scoring_strategy: ScoringStrategy,
+    #[allow(dead_code)]
     random_seed: u64,
     probability: f32,
     parallel_enabled: bool,
@@ -217,6 +218,7 @@ pub struct MultiTRCFBuilder {
     shingle_size: usize,
     arms: usize,
     probability: f32,
+    #[allow(dead_code)]
     scoring_strategy: ScoringStrategy,
     rcf_options: RCFOptions,
     trcf_options: TRCFOptions,
@@ -241,6 +243,7 @@ impl Default for MultiTRCFBuilder {
     }
 }
 
+#[allow(dead_code)]
 //just picking time stamp
 fn attribute_creator(_a: &[(u64, u64)], label: (u64, u64)) -> Result<u64> {
     Ok(label.1)

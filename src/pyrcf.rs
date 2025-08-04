@@ -178,10 +178,7 @@ impl RandomCutForest {
     #[new]
     pub fn new(options: RandomCutForestOptions) -> Result<Self> {
         let rcf = rcf::RandomCutForest::new(options.to_rcf_options())?;
-        Ok(Self {
-            rcf: rcf,
-            options: options,
-        })
+        Ok(Self { rcf, options })
     }
 
     pub fn shingled_point(&self, point: Vec<f32>) -> Result<Vec<f32>> {

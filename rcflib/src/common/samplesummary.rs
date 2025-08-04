@@ -31,8 +31,10 @@ use crate::common::cluster::{
 
 const MAX_NUMBER_PER_DIMENSION: usize = 5;
 
+#[allow(dead_code)]
 const PHASE2_THRESHOLD: usize = 2;
 
+#[allow(dead_code)]
 const LENGTH_BOUND: usize = 1000;
 
 const UPPER_FRACTION: f64 = 0.9;

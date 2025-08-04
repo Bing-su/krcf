@@ -69,6 +69,7 @@ impl WeightedTransformer {
         self.deviations[i].mean() as f32
     }
 
+    #[allow(dead_code)]
     fn shift_difference(&self, i: usize) -> f32 {
         self.deviations[i + self.input_length].mean() as f32
     }

@@ -254,6 +254,7 @@ impl BasicThresholder {
     // to increase proceed as upper_threshold, initial_threshold, lower_threshold, absolute_threshold
     // to decrease proceed in reverse of the above order
 
+    #[allow(dead_code)]
     pub fn set_lower_threshold(&mut self, lower: f32) {
         self.lower_threshold = lower;
     }
@@ -274,6 +275,7 @@ impl BasicThresholder {
         self.score_differencing = horizon;
     }
 
+    #[allow(dead_code)]
     pub fn last_score(&self) -> f32 {
         self.last_score
     }
@@ -282,6 +284,7 @@ impl BasicThresholder {
         self.primary_deviation.mean()
     }
 
+    #[allow(dead_code)]
     pub fn primary_deviation(&self) -> f64 {
         self.primary_deviation.deviation()
     }

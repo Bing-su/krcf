@@ -418,6 +418,7 @@ pub struct PreprocessorBuilder {
     weights: Option<Vec<f32>>,
     weight_time: f32,
     imputation_method: ImputationMethod,
+    #[allow(dead_code)]
     number_of_imputed: usize,
     clip_factor: f32,
     use_imputed_fraction: f32,
@@ -480,6 +481,7 @@ impl PreprocessorBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn imputation_method(
         &mut self,
         imputation_method: ImputationMethod,
@@ -498,6 +500,7 @@ impl PreprocessorBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn initial_accept_fraction(
         &mut self,
         use_imputed_fraction: f32,
@@ -506,6 +509,7 @@ impl PreprocessorBuilder {
         self
     }
 
+    #[allow(dead_code)]
     pub fn default_fill(&mut self, default_fill: &[f32]) -> &mut PreprocessorBuilder {
         self.default_fill = Some(Vec::from(default_fill));
         self
@@ -559,7 +563,7 @@ impl PreprocessorBuilder {
             self.start_normalization < 2000,
             "can cause delays, large memory usage",
         )?;
-        let random_seed = self.random_seed.unwrap_or(rand::random::<u64>());
+        // let random_seed = self.random_seed.unwrap_or(rand::random::<u64>());
         let default_fill = match &self.default_fill {
             Some(x) => x.clone(),
             _ => vec![0.0; self.input_dimensions],

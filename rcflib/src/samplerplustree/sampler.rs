@@ -46,6 +46,7 @@ where
         })
     }
 
+    #[allow(dead_code)]
     pub fn get_references(&self) -> &[P] {
         &self.points[0..self.current_size]
     }
@@ -70,6 +71,7 @@ where
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub fn reheap(&mut self, validate: bool) -> Result<()> {
         for i in ((self.current_size + 1) / 2)..=0 {
             self.swap_down(i, validate)?;

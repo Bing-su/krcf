@@ -18,7 +18,7 @@ pub struct InterpolationVisitor {
 }
 
 impl InterpolationVisitor {
-    pub fn new(tree_mass: usize, dimension: usize, visitor_info: &VisitorInfo) -> Self {
+    pub fn new(tree_mass: usize, dimension: usize, _visitor_info: &VisitorInfo) -> Self {
         InterpolationVisitor {
             tree_mass,
             leaf_index: usize::MAX,

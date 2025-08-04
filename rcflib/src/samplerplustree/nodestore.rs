@@ -496,6 +496,7 @@ where
         self.internal_node_manager.release(index)
     }
 
+    #[allow(dead_code)]
     pub fn cut_value(&self, index: usize) -> f32 {
         self.cut_value[index]
     }

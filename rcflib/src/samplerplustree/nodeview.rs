@@ -1,10 +1,7 @@
 use crate::{
     common::divector::DiVector,
     pointstore::PointStore,
-    samplerplustree::{
-        boundingbox::BoundingBox,
-        nodestore::{BasicStore, NodeStore},
-    },
+    samplerplustree::{boundingbox::BoundingBox, nodestore::NodeStore},
     types::Result,
     visitor::visitor::VisitorInfo,
 };
@@ -59,6 +56,7 @@ pub trait UpdatableMultiNodeView<
     Attributes: Copy + Sync + Hash + Eq + Send,
 >: UpdatableNodeView<Label, Attributes>
 {
+    #[allow(dead_code)]
     fn create<NS: NodeStore<Label, Attributes>>(root: usize, node_store: &NS) -> Self;
     fn set_trigger_traversing_down<
         PS: PointStore<Label, Attributes>,
