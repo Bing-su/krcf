@@ -2,11 +2,30 @@
 
 version: "3"
 
-vars:
-  GREETING: Hello, World!
-
 tasks:
   default:
     cmds:
-      - echo "{{.GREETING}}"
+      - task --list
     silent: true
+
+  update:cargo:
+    cmds:
+      - cargo update
+    desc: Update Cargo dependencies
+
+  update:python:
+    cmds:
+      - uv sync --upgrade --all-extras --all-groups
+    desc: Update Python dependencies
+
+  update:pre-commit:
+    cmds:
+      - pre-commit autoupdate --jobs 5
+    desc: Update pre-commit hooks
+
+  update:
+    cmds:
+      - task: update:cargo
+      - task: update:python
+      - task: update:pre-commit
+    desc: Update all dependencies
