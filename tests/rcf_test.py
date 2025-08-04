@@ -102,11 +102,11 @@ def test_near_neighbor_list(points: np.ndarray):
     forest = RandomCutForest(opts)
     for point in points:
         forest.update(point)
+
     try:
-        neighbors = forest.near_neighbor_list([1.0] * 5, percentile=1)
+        neighbors = forest.near_neighbor_list([1.0] * dim, percentile=1)
     except RuntimeError:
         return
-
     assert isinstance(neighbors, list)
     assert len(neighbors) > 0
     assert sorted(neighbors[0]) == ["distance", "point", "score"]
@@ -121,12 +121,8 @@ def test_options():
     forest = RandomCutForest(opts)
     options = forest.options()
     for k, v in options.items():
-        if k == "dimensions":
-            assert v == opts["dimensions"]
-        elif k == "shingle_size":
-            assert v == opts["shingle_size"]
-        elif k == "output_after":
-            assert v == opts["output_after"]
+        if k in opts:
+            assert v == opts[k]
         else:
             assert v is None, f"Unexpected option {k} with value {v}"
 
