@@ -1,5 +1,5 @@
-use crate::rcf;
 use anyhow::Result;
+use krcf;
 use pyo3::prelude::*;
 use rcflib::common::{directionaldensity, divector, rangevector};
 
@@ -76,11 +76,11 @@ pub struct NearNeighbor {
 }
 
 impl From<(f64, Vec<f32>, f64)> for NearNeighbor {
-    fn from(tuple: (f64, Vec<f32>, f64)) -> Self {
+    fn from((score, point, distance): (f64, Vec<f32>, f64)) -> Self {
         Self {
-            score: tuple.0,
-            point: tuple.1,
-            distance: tuple.2,
+            score,
+            point,
+            distance,
         }
     }
 }
@@ -121,8 +121,8 @@ pub struct RandomCutForestOptions {
 }
 
 impl RandomCutForestOptions {
-    fn to_rcf_options(&self) -> rcf::RandomCutForestOptions {
-        rcf::RandomCutForestOptions {
+    fn to_rcf_options(&self) -> krcf::RandomCutForestOptions {
+        krcf::RandomCutForestOptions {
             dimensions: self.dimensions,
             shingle_size: self.shingle_size,
             id: self.id,
@@ -169,7 +169,7 @@ impl Default for RandomCutForestOptions {
 #[pyclass(module = "krcf.krcf", str)]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RandomCutForest {
-    pub rcf: rcf::RandomCutForest,
+    pub rcf: krcf::RandomCutForest,
     pub options: RandomCutForestOptions,
 }
 
@@ -177,7 +177,7 @@ pub struct RandomCutForest {
 impl RandomCutForest {
     #[new]
     pub fn new(options: RandomCutForestOptions) -> Result<Self> {
-        let rcf = rcf::RandomCutForest::new(options.to_rcf_options())?;
+        let rcf = krcf::RandomCutForest::new(options.to_rcf_options())?;
         Ok(Self { rcf, options })
     }
 

@@ -24,8 +24,9 @@ tasks:
     desc: Update pre-commit hooks
 
   update:
+    deps:
+      - update:cargo
+      - update:pre-commit
     cmds:
-      - task: update:cargo
       - task: update:python
-      - task: update:pre-commit
     desc: Update all dependencies

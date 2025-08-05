@@ -1,7 +1,27 @@
-[package]
-name = "krcf"
-version = "0.2.0"
+[workspace]
+members = ["crates/*", "."]
+
+[workspace.package]
 edition = "2024"
+version = "0.2.0"
+license = "Apache-2.0"
+repository = "https://github.com/Bing-su/krcf"
+
+[workspace.dependencies]
+anyhow = "1"
+rcflib = { path = "./crates/rcflib" }
+krcf = { path = "./crates/krcf" }
+rmp-serde = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[package]
+name = "krcf_py"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+description = "Python bindings for AWS's rust Random Cut Forest implementation"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
@@ -9,19 +29,23 @@ name = "krcf"
 crate-type = ["cdylib"]
 
 [dependencies]
-anyhow = ">=1"
+anyhow = { workspace = true }
 pyo3 = { version = "*", features = [
     "extension-module",
     "generate-import-lib",
     "anyhow",
 ] }
-rcf = { path = "./rcflib" }
-rmp-serde = ">=1.0"
-serde = { version = ">=1.0", features = ["derive"] }
-serde_json = ">=1.0"
+rcflib = { workspace = true }
+krcf = { workspace = true }
+rmp-serde = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 
 [profile.release]
 codegen-units = 1
 lto = true
 strip = true
 split-debuginfo = "packed"
+
+[profile.test]
+opt-level = 3

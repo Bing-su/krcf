@@ -1,11 +1,9 @@
 [package]
-name = "rcf"
+name = "rcflib"
 version = "4.0.0"
 edition = "2021"
 license = "Apache-2.0"
-
-[profile.test]
-opt-level = 3
+description = "Modified https://github.com/aws/random-cut-forest-by-aws"
 
 [lib]
 name = "rcflib"
@@ -23,7 +21,7 @@ rayon = "*"
 rand = "*"
 rand_chacha = "*"
 rand_core = "*"
-serde = { version = ">=1", features = ["derive"] }
+serde = { workspace = true }
 
 [dev-dependencies]
 parameterized_test = "*"
