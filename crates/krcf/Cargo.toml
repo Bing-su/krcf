@@ -1,0 +1,20 @@
+[package]
+name = "krcf"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+description = "Random Cut Forest implementation in Rust"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "krcf"
+crate-type = ["lib"]
+
+[dependencies]
+anyhow = { workspace = true }
+rcflib = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
