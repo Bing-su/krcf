@@ -24,6 +24,8 @@ jobs:
         include:
           - os: ubuntu-latest
             cibw-archs: auto64
+          - os: ubuntu-latest
+            cibw-archs: riscv64
           - os: ubuntu-24.04-arm
           - os: macos-latest
           - os: windows-latest
@@ -66,9 +68,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: riscv64gc-unknown-linux-gnu
-            manylinux: auto
-            args: --out dist
           - target: riscv64gc-unknown-linux-musl
             manylinux: musllinux_1_2
             args: --out dist --zig
