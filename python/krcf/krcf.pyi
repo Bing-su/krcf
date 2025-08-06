@@ -1,15 +1,25 @@
+from __future__ import annotations
+
 import sys
 from collections.abc import Sequence
+from typing import SupportsFloat
+
+import numpy as np
 
 from .options import RandomCutForestOptions
 from .types import DiVector, InterpolationMeasure, NearNeighbor, RangeVector
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TypeAlias
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, TypeAlias
 
 __version__: str
+
+_1DArray: TypeAlias = (
+    Sequence[SupportsFloat]
+    | np.ndarray[tuple[int], np.dtype[np.floating | np.integer | np.bool]]
+)
 
 class RandomCutForest:
     """
@@ -22,7 +32,7 @@ class RandomCutForest:
     """
 
     def __init__(self, options: RandomCutForestOptions): ...
-    def shingled_point(self, point: Sequence[float]) -> list[float]:
+    def shingled_point(self, point: _1DArray) -> list[float]:
         """
         Returns the shingled version of the input point.
 
@@ -36,7 +46,7 @@ class RandomCutForest:
         list[float]
             Shingled data point.
         """
-    def update(self, point: Sequence[float]) -> None:
+    def update(self, point: _1DArray) -> None:
         """
         Updates the forest with a new data point.
 
@@ -49,7 +59,7 @@ class RandomCutForest:
         -------
         None
         """
-    def score(self, point: Sequence[float]) -> float:
+    def score(self, point: _1DArray) -> float:
         """
         Computes the anomaly score for the given point.
 
@@ -63,7 +73,7 @@ class RandomCutForest:
         float
             Anomaly score.
         """
-    def displacement_score(self, point: Sequence[float]) -> float:
+    def displacement_score(self, point: _1DArray) -> float:
         """
         Computes the displacement score for the given point.
 
@@ -77,7 +87,7 @@ class RandomCutForest:
         float
             Displacement score.
         """
-    def attribution(self, point: Sequence[float]) -> DiVector:
+    def attribution(self, point: _1DArray) -> DiVector:
         """
         Returns the attribution vector for the input point.
 
@@ -92,7 +102,7 @@ class RandomCutForest:
             Attribution vector.
         """
     def near_neighbor_list(
-        self, point: Sequence[float], percentile: int
+        self, point: _1DArray, percentile: int
     ) -> list[NearNeighbor]:
         """
         Returns a list of near neighbors for the input point.
@@ -109,7 +119,7 @@ class RandomCutForest:
         list of NearNeighbor
             List of near neighbors containing score, neighbor point, and distance.
         """
-    def density(self, point: Sequence[float]) -> float:
+    def density(self, point: _1DArray) -> float:
         """
         Computes the density estimate for the input point.
 
@@ -123,7 +133,7 @@ class RandomCutForest:
         float
             Density estimate.
         """
-    def directional_density(self, point: Sequence[float]) -> DiVector:
+    def directional_density(self, point: _1DArray) -> DiVector:
         """
         Computes the directional density for the input point.
 
@@ -137,7 +147,7 @@ class RandomCutForest:
         DiVector
             Directional density vector.
         """
-    def density_interpolant(self, point: Sequence[float]) -> InterpolationMeasure:
+    def density_interpolant(self, point: _1DArray) -> InterpolationMeasure:
         """
         Computes the density interpolant for the input point.
 

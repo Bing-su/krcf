@@ -4,7 +4,10 @@ import copy
 import json
 import pickle
 import platform
+from collections import UserList
 from concurrent.futures import ThreadPoolExecutor
+from decimal import Decimal
+from fractions import Fraction
 from typing import Any, Callable
 
 import jsonpickle
@@ -337,3 +340,45 @@ def test_rcf_thread_safety(parallel: bool):  # noqa: FBT001
     score = forest.score(anomaly.tolist())
     assert isinstance(score, float)
     assert score >= 2
+
+
+def test_rcf_types():
+    dim = 10
+    opts: RandomCutForestOptions = {
+        "dimensions": dim,
+        "shingle_size": 1,
+        "output_after": 1,
+    }
+
+    forest = RandomCutForest(opts)
+
+    input1 = np.full(dim, True, dtype=np.bool)  # noqa: FBT003
+    forest.update(input1)
+
+    input2 = np.full(dim, 1, dtype=np.int32)
+    forest.update(input2)
+
+    input3 = np.full(dim, 1.0, dtype=np.float16)
+    forest.update(input3)
+
+    input4 = np.full(dim, 1.0, dtype=np.float64)
+    forest.update(input4)
+
+    input5 = [Decimal("1.0")] * dim
+    forest.update(input5)
+
+    input6 = UserList([1] * dim)
+    forest.update(input6)
+
+    input7 = [Fraction(1, 1)] * dim
+    forest.update(input7)
+
+    input8 = [True] * dim
+    forest.update(input8)
+
+    class FloatLike:
+        def __float__(self) -> float:
+            return 1.0
+
+    input9 = [FloatLike() for _ in range(dim)]
+    forest.update(input9)
