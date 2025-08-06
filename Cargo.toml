@@ -9,8 +9,8 @@ repository = "https://github.com/Bing-su/krcf"
 
 [workspace.dependencies]
 anyhow = "1"
-krcflib = { path = "./crates/rcflib" }
-krcf = { path = "./crates/krcf" }
+krcflib = { path = "./crates/rcflib", version = "4" }
+krcf = { path = "./crates/krcf", version = "<1" }
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

@@ -4,6 +4,7 @@ version = "4.0.0"
 edition = "2021"
 license = "Apache-2.0"
 description = "Modified https://github.com/aws/random-cut-forest-by-aws"
+repository = { workspace = true }
 
 [lib]
 name = "rcflib"
@@ -16,12 +17,12 @@ path = "src/example.rs"
 
 
 [dependencies]
-num = "*"
-rayon = "*"
-rand = "*"
-rand_chacha = "*"
-rand_core = "*"
+num = ">=0.4, <1"
+rayon = "1"
+rand = ">=0.9, <1"
+rand_chacha = ">=0.9, <1"
+rand_core = ">=0.9, <1"
 serde = { workspace = true }
 
 [dev-dependencies]
-parameterized_test = "*"
+parameterized_test = "<1"
