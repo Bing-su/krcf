@@ -9,7 +9,7 @@ repository = "https://github.com/Bing-su/krcf"
 
 [workspace.dependencies]
 anyhow = "1"
-rcflib = { path = "./crates/rcflib" }
+krcflib = { path = "./crates/rcflib" }
 krcf = { path = "./crates/krcf" }
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
@@ -35,7 +35,7 @@ pyo3 = { version = "*", features = [
     "generate-import-lib",
     "anyhow",
 ] }
-rcflib = { workspace = true }
+krcflib = { workspace = true }
 krcf = { workspace = true }
 rmp-serde = { workspace = true }
 serde = { workspace = true }

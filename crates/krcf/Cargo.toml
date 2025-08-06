@@ -13,7 +13,7 @@ crate-type = ["lib"]
 
 [dependencies]
 anyhow = { workspace = true }
-rcflib = { workspace = true }
+krcflib = { workspace = true }
 serde = { workspace = true }
 
 [dev-dependencies]
