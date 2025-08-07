@@ -6,23 +6,44 @@ use rcflib::{
     rcf::{AugmentedRCF, RCFBuilder, RCFLarge, RCFOptionsBuilder},
 };
 
+/// Represents the configuration options for creating a Random Cut Forest.
+///
+/// This struct allows for detailed configuration of the RCF, including its dimensions,
+/// capacity, and behavior. It is used with `RandomCutForest::new` to initialize a forest.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RandomCutForestOptions {
+    /// The number of features in each data point. This is a mandatory parameter.
     pub dimensions: usize,
+    /// The number of consecutive data points to be combined into a single point in the forest.
+    /// This is useful for time-series data and is a mandatory parameter.
     pub shingle_size: usize,
+    /// A unique identifier for the forest.
     pub id: Option<u64>,
+    /// The number of trees in the forest. A larger number of trees can improve accuracy.
     pub num_trees: Option<usize>,
+    /// The maximum number of points stored in each tree. This is also known as the sample size.
     pub sample_size: Option<usize>,
+    /// The number of points that must be processed before the forest is ready to provide anomaly scores.
     pub output_after: Option<usize>,
+    /// A seed for the random number generator to ensure reproducibility.
     pub random_seed: Option<u64>,
+    /// Enables or disables parallel execution for the RCF operations.
     pub parallel_execution_enabled: Option<bool>,
+    /// A decay factor for the importance of older points. Helps the model adapt to changing data patterns.
     pub lambda: Option<f64>,
+    /// Enables or disables internal rotation of data points to improve performance.
     pub internal_rotation: Option<bool>,
+    /// Enables or disables automatic shingling of the input data stream.
     pub internal_shingling: Option<bool>,
+    /// Determines whether to propagate attribute vectors through the forest.
     pub propagate_attribute_vectors: Option<bool>,
+    /// Determines whether to store the sum of points in the trees.
     pub store_pointsum: Option<bool>,
+    /// Determines whether to store attributes associated with the points.
     pub store_attributes: Option<bool>,
+    /// The fraction of initial points to accept unconditionally. (0, 1]
     pub initial_accept_fraction: Option<f64>,
+    /// The fraction of the bounding box cache to use. [0, 1]
     pub bounding_box_cache_fraction: Option<f64>,
 }
 
@@ -50,6 +71,10 @@ impl Default for RandomCutForestOptions {
 }
 
 impl RandomCutForestOptions {
+    /// Converts the `RandomCutForestOptions` into an `RCFBuilder`.
+    ///
+    /// This method facilitates the construction of a Random Cut Forest by applying the specified
+    /// options to an `RCFBuilder` from the underlying `rcflib`.
     pub fn to_rcf_builder(&self) -> RCFBuilder {
         let mut options = RCFBuilder::new(self.dimensions, self.shingle_size);
 
@@ -86,40 +111,95 @@ impl RandomCutForestOptions {
         options
     }
 
+    /// Builds a `RCFLarge` instance from the options.
+    ///
+    /// This is a convenience method that uses `to_rcf_builder` to construct and then build
+    /// a simple, large-scale Random Cut Forest.
     pub fn to_rcf(&self) -> Result<RCFLarge<u64, u64>, RCFError> {
         self.to_rcf_builder().build_large_simple()
     }
 }
 
+/// A wrapper around `rcflib::rcf::RCFLarge` that provides a high-level API for the Random Cut Forest algorithm.
+///
+/// This struct is the main entry point for interacting with the RCF. It supports serialization and deserialization.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RandomCutForest(RCFLarge<u64, u64>);
 
 impl RandomCutForest {
+    /// Creates a new `RandomCutForest` with the specified options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A `RandomCutForestOptions` struct that defines the configuration of the forest.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the new `RandomCutForest` instance or an `RCFError` if creation fails.
     pub fn new(options: RandomCutForestOptions) -> Result<Self, RCFError> {
         let rcf = options.to_rcf()?;
         Ok(Self(rcf))
     }
 
+    /// Transforms a single-dimensional point into a shingled point.
+    ///
+    /// # Arguments
+    ///
+    /// * `point` - A slice of f32 representing the data point.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the shingled point as a `Vec<f32>` or an `RCFError`.
     pub fn shingled_point(&self, point: &[f32]) -> Result<Vec<f32>, RCFError> {
         self.0.shingled_point(point)
     }
 
+    /// Updates the forest with a new data point.
+    ///
+    /// # Arguments
+    ///
+    /// * `point` - A slice of f32 representing the data point to add to the forest.
     pub fn update(&mut self, point: &[f32]) -> Result<(), RCFError> {
         self.0.update(point, 0)
     }
 
+    /// Computes the anomaly score for a given data point.
+    ///
+    /// A higher score indicates a higher likelihood of the point being an anomaly.
+    ///
+    /// # Arguments
+    ///
+    /// * `point` - The data point to score.
     pub fn score(&self, point: &[f32]) -> Result<f64, RCFError> {
         self.0.score(point)
     }
 
+    /// Computes the displacement score for a given data point.
+    ///
+    /// This score measures how much the model's structure would change if the point were added.
+    ///
+    /// # Arguments
+    ///
+    /// * `point` - The data point to score.
     pub fn displacement_score(&self, point: &[f32]) -> Result<f64, RCFError> {
         self.0.displacement_score(point)
     }
 
+    /// Computes the attribution of the anomaly score to each dimension of the data point.
+    ///
+    /// # Arguments
+    ///
+    /// * `point` - The data point for which to compute attribution.
     pub fn attribution(&self, point: &[f32]) -> Result<DiVector, RCFError> {
         self.0.attribution(point)
     }
 
+    /// Finds a list of near neighbors for a given point.
+    ///
+    /// # Arguments
+    ///
+    /// * `point` - The point to find neighbors for.
+    /// * `percentile` - The percentile of neighbors to return.
     pub fn near_neighbor_list(
         &self,
         point: &[f32],
@@ -128,38 +208,63 @@ impl RandomCutForest {
         self.0.near_neighbor_list(point, percentile)
     }
 
+    /// Estimates the density of the data at a given point.
+    ///
+    /// # Arguments
+    ///
+    /// * `point` - The point at which to estimate density.
     pub fn density(&self, point: &[f32]) -> Result<f64, RCFError> {
         self.0.density(point)
     }
 
+    /// Computes the directional density of the data at a given point.
+    ///
+    /// # Arguments
+    ///
+    /// * `point` - The point at which to compute directional density.
     pub fn directional_density(&self, point: &[f32]) -> Result<DiVector, RCFError> {
         self.0.directional_density(point)
     }
 
+    /// Computes an interpolation measure for the density at a given point.
+    ///
+    /// # Arguments
+    ///
+    /// * `point` - The point for which to compute the density interpolant.
     pub fn density_interpolant(&self, point: &[f32]) -> Result<InterpolationMeasure, RCFError> {
         self.0.density_interpolant(point)
     }
 
+    /// Extrapolates future data points based on the current state of the model.
+    ///
+    /// # Arguments
+    ///
+    /// * `look_ahead` - The number of future time steps to extrapolate.
     pub fn extrapolate(&self, look_ahead: usize) -> Result<RangeVector<f32>, RCFError> {
         self.0.extrapolate(look_ahead)
     }
 
+    /// Returns the number of dimensions of the data points in the forest.
     pub fn dimensions(&self) -> usize {
         self.0.dimensions()
     }
 
+    /// Returns the shingle size used by the forest.
     pub fn shingle_size(&self) -> usize {
         self.0.shingle_size()
     }
 
+    /// Checks if internal shingling is enabled.
     pub fn is_internal_shingling_enabled(&self) -> bool {
         self.0.is_internal_shingling_enabled()
     }
 
+    /// Checks if the forest is ready to produce anomaly scores.
     pub fn is_output_ready(&self) -> bool {
         self.0.is_output_ready()
     }
 
+    /// Returns the total number of data points seen by the forest.
     pub fn entries_seen(&self) -> u64 {
         self.0.entries_seen()
     }
