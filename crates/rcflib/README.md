@@ -8,11 +8,11 @@ This library provides a flexible and efficient implementation of RCF, suitable f
 
 ## Features
 
-*   **Anomaly Detection:** Assigns an anomaly score to each data point. Higher scores indicate a higher likelihood of being an anomaly.
-*   **Streaming Data:** Designed to work with continuous data streams, updating the model as new data arrives.
-*   **Multi-dimensional Data:** Handles data with multiple features.
-*   **Imputation/Extrapolation:** Can be used to predict missing values or forecast future values.
-*   **Configurable:** Allows tuning of various parameters like the number of trees, tree capacity (shingle size), and time decay to suit different data characteristics.
+- **Anomaly Detection:** Assigns an anomaly score to each data point. Higher scores indicate a higher likelihood of being an anomaly.
+- **Streaming Data:** Designed to work with continuous data streams, updating the model as new data arrives.
+- **Multi-dimensional Data:** Handles data with multiple features.
+- **Imputation/Extrapolation:** Can be used to predict missing values or forecast future values.
+- **Configurable:** Allows tuning of various parameters like the number of trees, tree capacity (shingle size), and time decay to suit different data characteristics.
 
 ## Usage
 
@@ -92,11 +92,11 @@ fn main() {
 ### Explanation
 
 1.  **`RCFBuilder`**: This is the main entry point for creating a `RandomCutForest`. It allows you to configure the forest's parameters.
-    *   `base_dimension`: The number of features in your data.
-    *   `shingle_size`: The number of recent data points to consider together as a single point in the forest. This is useful for detecting anomalies in time-series data. If you are not using time-series data, you can set this to 1.
-    *   `number_of_trees`: The number of trees in the forest. More trees can lead to more accurate results but will increase memory usage and processing time.
-    *   `tree_capacity`: The maximum number of points stored in each tree.
-    *   `time_decay`: A parameter that determines how much weight is given to older points. A non-zero value helps the model adapt to changing data patterns.
+    - `base_dimension`: The number of features in your data.
+    - `shingle_size`: The number of recent data points to consider together as a single point in the forest. This is useful for detecting anomalies in time-series data. If you are not using time-series data, you can set this to 1.
+    - `number_of_trees`: The number of trees in the forest. More trees can lead to more accurate results but will increase memory usage and processing time.
+    - `tree_capacity`: The maximum number of points stored in each tree.
+    - `time_decay`: A parameter that determines how much weight is given to older points. A non-zero value helps the model adapt to changing data patterns.
 
 2.  **`score()`**: This method takes a data point and returns an anomaly score. The score is a measure of how much the new point deviates from the patterns learned by the forest.
 
