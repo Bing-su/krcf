@@ -9,7 +9,7 @@ use crate::trcf::types::{CorrectionMode, ImputationMethod, ScoringStrategy, Tran
  * except for discount rate which is useful as initialization from raw scores
  */
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Descriptor {
     pub id: u64,
     pub current_input: Vec<f32>,
@@ -39,7 +39,7 @@ pub struct Descriptor {
 }
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AnomalyInformation {
     // we do not explicitly provide a default so that each of these entires are
     // considered carefully before declaring an anomaly
@@ -60,7 +60,7 @@ pub struct AnomalyInformation {
 }
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ErrorInformation {
     pub interval_precision: Vec<f32>,
     pub error_distribution: RangeVector<f32>,

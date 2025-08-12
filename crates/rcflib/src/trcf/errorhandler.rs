@@ -6,7 +6,7 @@ use crate::types::Result;
 use crate::util::{check_argument, maxf32, minf32};
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ErrorHandler {
     add_error: bool,
     input_length: usize,

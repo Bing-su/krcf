@@ -21,7 +21,7 @@ const DEFAULT_NORMALIZATION: bool = false;
 pub const DEFAULT_DEVIATION_STATES: usize = 5;
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Preprocessor {
     timestamp_deviations: Vec<Deviation>,
     normalize_time: bool,

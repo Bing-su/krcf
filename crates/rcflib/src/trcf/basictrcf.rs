@@ -16,7 +16,7 @@ use rand_chacha::ChaCha20Rng;
 use rand_core::SeedableRng;
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Bandit {
     id: u64,
     current_model: usize,
@@ -27,7 +27,7 @@ pub struct Bandit {
 }
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct State {
     pub id: u64,
     random_seed: u64,
@@ -241,6 +241,7 @@ impl BasicTRCF {
     }
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TRCFOptions {
     pub(crate) transform_decay: Option<f64>,
     pub(crate) transform_method: TransformMethod,

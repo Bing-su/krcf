@@ -1,8 +1,9 @@
 #![allow(non_camel_case_types)]
 
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum TransformMethod {
     NONE,
     WEIGHTED,
@@ -26,7 +27,7 @@ impl fmt::Display for TransformMethod {
     }
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum ImputationMethod {
     //use a fixed set of specified values (same as input dimension)
     FIXED,
@@ -41,7 +42,7 @@ pub enum ImputationMethod {
     USE_RCF,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum ForestMode {
     /**
      * a standard mode that uses shingling and most known applications; it uses the
@@ -65,7 +66,7 @@ pub enum ForestMode {
 
 // alternate scoring that can be thresholded differently
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum ScoringStrategy {
     EXPECTED_INVERSE_HEIGHT,
     /**
@@ -85,7 +86,7 @@ pub enum ScoringStrategy {
     DISTANCE,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum CorrectionMode {
     /**
      * default behavior, no correction
@@ -124,7 +125,7 @@ pub enum CorrectionMode {
     DATA_DRIFT,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum Calibration {
     NONE,
 

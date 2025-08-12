@@ -14,7 +14,7 @@ use rand_core::SeedableRng;
 use rayon::prelude::*;
 use std::collections::HashMap;
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MultiTRCFLabel(pub u64, pub u64);
 
 impl Into<u64> for MultiTRCFLabel {
@@ -29,6 +29,7 @@ impl From<(u64, u64)> for MultiTRCFLabel {
     }
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MultiTRCF {
     arms: usize,
     rcfs: Vec<RCFLarge<MultiTRCFLabel, u64>>,
@@ -42,7 +43,7 @@ pub struct MultiTRCF {
     random_seed: u64,
     probability: f32,
     parallel_enabled: bool,
-    selector: fn(&Descriptor) -> bool,
+    // selector: fn(&Descriptor) -> bool,
 }
 
 fn is_anomaly(a: &Descriptor) -> bool {
@@ -105,7 +106,8 @@ impl MultiTRCF {
         } else {
             None
         };
-        if (self.selector)(&t) {
+        // if (self.selector)(&t) {
+        if is_anomaly(&t) {
             Ok((
                 (state.bandit.current_model(), (state.id, timestamp), point),
                 Some(t),
@@ -333,7 +335,7 @@ impl MultiTRCFBuilder {
             scoring_strategy: self.trcf_options.scoring_strategy,
             random_seed,
             probability: self.probability,
-            selector: is_anomaly,
+            // selector: is_anomaly,
         })
     }
 }

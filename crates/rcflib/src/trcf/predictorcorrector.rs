@@ -19,7 +19,7 @@ const DEFAULT_DIFFERENTIAL_FACTOR: f32 = 0.3;
 const DEFAULT_RUN_ALLOWED: usize = 2;
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PredictorCorrector {
     basic_thresholder: BasicThresholder,
     auto_adjust: bool,

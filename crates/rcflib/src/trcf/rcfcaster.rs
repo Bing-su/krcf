@@ -16,6 +16,7 @@ pub const DEFAULT_ERROR_PERCENTILE: f32 = 0.1;
 
 pub const MAX_ERROR_HORIZON: usize = 1024;
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RCFCaster {
     forecast_horizon: usize,
     rcf: RCFLarge<u64, u64>,
