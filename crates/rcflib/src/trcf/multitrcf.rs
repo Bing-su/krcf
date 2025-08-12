@@ -1,6 +1,6 @@
 use crate::common::descriptor::Descriptor;
 use crate::rcf::RCFOptionsBuilder;
-use crate::rcf::{AugmentedRCF, RCFBuilder, RCFOptions, RCF};
+use crate::rcf::{AugmentedRCF, RCFBuilder, RCFLarge, RCFOptions};
 use crate::trcf::basictrcf::{core_process, State, TRCFOptions, TRCFOptionsBuilder};
 use crate::trcf::predictorcorrector::PredictorCorrector;
 use crate::trcf::preprocessor::PreprocessorBuilder;
@@ -31,7 +31,7 @@ impl From<(u64, u64)> for MultiTRCFLabel {
 
 pub struct MultiTRCF {
     arms: usize,
-    rcfs: Vec<Box<dyn AugmentedRCF<MultiTRCFLabel, u64> + Send + Sync>>,
+    rcfs: Vec<RCFLarge<MultiTRCFLabel, u64>>,
     states: HashMap<u64, State>,
     input_dimensions: usize,
     shingle_size: usize,
@@ -63,7 +63,7 @@ impl MultiTRCF {
         let internal_timestamp = state.preprocessor.internal_timestamp();
         if self.arms > 1 && state.bandit.is_evaluating(self.arms, internal_timestamp) {
             let shingled_point = state.preprocessor.shingled_point(
-                None as Option<&Box<dyn RCF>>,
+                None as Option<&RCFLarge<MultiTRCFLabel, u64>>,
                 &point,
                 timestamp,
             )?;
@@ -316,7 +316,7 @@ impl MultiTRCFBuilder {
                     .initial_accept_fraction(self.rcf_options.initial_accept_fraction)
                     .internal_shingling(false)
                     .random_seed(random_seed)
-                    .build_to_u64()
+                    .build_large::<MultiTRCFLabel, u64>()
                     .unwrap(),
             );
             random_seed += 1;

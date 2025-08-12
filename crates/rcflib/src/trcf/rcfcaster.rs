@@ -1,7 +1,7 @@
 use crate::common::descriptor::Descriptor;
 use crate::common::rangevector::RangeVector;
-use crate::rcf::RCFOptionsBuilder;
-use crate::rcf::{RCFBuilder, RCFOptions, RCF};
+use crate::rcf::{AugmentedRCF, RCFOptionsBuilder};
+use crate::rcf::{RCFBuilder, RCFLarge, RCFOptions};
 use crate::trcf::basictrcf::{core_process, State, TRCFOptions, TRCFOptionsBuilder};
 use crate::trcf::errorhandler::ErrorHandler;
 use crate::trcf::predictorcorrector::PredictorCorrector;
@@ -18,7 +18,7 @@ pub const MAX_ERROR_HORIZON: usize = 1024;
 
 pub struct RCFCaster {
     forecast_horizon: usize,
-    rcf: Box<dyn RCF + Send + Sync>,
+    rcf: RCFLarge<u64, u64>,
     state: State,
     error_handler: ErrorHandler,
     calibration_method: Calibration,
@@ -202,7 +202,7 @@ impl RCFCasterBuilder {
             .bounding_box_cache_fraction(self.rcf_options.bounding_box_cache_fraction)
             .output_after(output_after)
             .initial_accept_fraction(self.rcf_options.initial_accept_fraction)
-            .build_default()?;
+            .build_large_simple::<u64>()?;
         let preprocessor = PreprocessorBuilder::new(self.input_dimensions, self.shingle_size)
             .transform_decay(transform_decay)
             .transform_method(self.trcf_options.transform_method)
