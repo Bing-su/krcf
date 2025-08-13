@@ -1,7 +1,7 @@
 use crate::common::descriptor::{AnomalyInformation, Descriptor};
 use crate::common::deviation::Deviation;
 use crate::common::rangevector::RangeVector;
-use crate::rcf::{AugmentedRCF, RCF};
+use crate::rcf::{AugmentedRCF, RCFLarge};
 use crate::trcf::transformer::WeightedTransformer;
 use crate::trcf::types::ForestMode::{STANDARD, STREAMING_IMPUTE, TIME_AUGMENTED};
 use crate::trcf::types::ImputationMethod::USE_RCF;
@@ -21,7 +21,7 @@ const DEFAULT_NORMALIZATION: bool = false;
 pub const DEFAULT_DEVIATION_STATES: usize = 5;
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Preprocessor {
     timestamp_deviations: Vec<Deviation>,
     normalize_time: bool,
@@ -55,19 +55,12 @@ impl Preprocessor {
             || (self.transform_method != NORMALIZE && self.transform_method != NORMALIZE_DIFFERENCE)
     }
 
-    pub fn shingled_point<
-        U: ?Sized,
-        Label: Sync + Copy + Into<Attributes>,
-        Attributes: Sync + Copy,
-    >(
+    pub fn shingled_point<Label: Send + Sync + Copy + Into<u64>>(
         &mut self,
-        _rcf: Option<&Box<U>>,
+        _rcf: Option<&RCFLarge<Label, u64>>,
         input: &[f32],
         timestamp: u64,
-    ) -> Result<Option<Vec<f32>>>
-    where
-        U: AugmentedRCF<Label, Attributes>,
-    {
+    ) -> Result<Option<Vec<f32>>> {
         check_argument(input.len() == self.input_dimensions, "incorrect length")?;
         for x in input {
             check_argument(f32::is_finite(*x), " numbers should be finite")?;
@@ -81,7 +74,7 @@ impl Preprocessor {
                 // it can be on seeing the next input (here) or having seen the last input
                 // but forecasting for a single time series is better served
                 // having seen all available data specially when there are a few values
-                self.drain(None as Option<&mut Box<dyn RCF>>)?;
+                self.drain(None as Option<&mut RCFLarge<u64, u64>>)?;
             }
             let input = &self.transform(input, timestamp);
             let mut copy = self.last_shingled_point.clone();
@@ -192,10 +185,7 @@ impl Preprocessor {
         Ok(())
     }
 
-    pub fn drain<U: ?Sized>(&mut self, rcf: Option<&mut Box<U>>) -> Result<()>
-    where
-        U: RCF,
-    {
+    pub fn drain(&mut self, rcf: Option<&mut RCFLarge<u64, u64>>) -> Result<()> {
         if self.values_seen == self.start_normalization {
             let mut previous = &self.initial_values[0];
             let mut previous_timestamp = self.initial_timestamps[0];

@@ -1,7 +1,7 @@
 use crate::common::descriptor::Descriptor;
 use crate::common::deviation::Deviation;
 use crate::common::divector::DiVector;
-use crate::rcf::AugmentedRCF;
+use crate::rcf::{AugmentedRCF, RCFLarge};
 use crate::trcf::basicthresholder::BasicThresholder;
 use crate::trcf::types::CorrectionMode::{
     ANOMALY_IN_SHINGLE, CONDITIONAL_FORECAST, DATA_DRIFT, FORECAST, NOISE,
@@ -19,7 +19,7 @@ const DEFAULT_DIFFERENTIAL_FACTOR: f32 = 0.3;
 const DEFAULT_RUN_ALLOWED: usize = 2;
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PredictorCorrector {
     basic_thresholder: BasicThresholder,
     auto_adjust: bool,
@@ -50,21 +50,14 @@ impl PredictorCorrector {
         })
     }
 
-    pub fn expected_point<
-        U: ?Sized,
-        Label: Sync + Copy + Into<Attributes>,
-        Attributes: Sync + Copy,
-    >(
+    pub fn expected_point<Label: Send + Sync + Copy + Into<u64>>(
         di_vector: &DiVector,
         max_attributors: usize,
         position: usize,
         base_dimension: usize,
         point: &[f32],
-        forest: &Box<U>,
-    ) -> Result<Vec<f32>>
-    where
-        U: AugmentedRCF<Label, Attributes>,
-    {
+        forest: &RCFLarge<Label, u64>,
+    ) -> Result<Vec<f32>> {
         let mut likely_missing_indices: Vec<usize>;
 
         if base_dimension == 1 {
@@ -296,21 +289,14 @@ impl PredictorCorrector {
         return !(answer);
     }
 
-    fn explained_by_conditional_field<
-        U: ?Sized,
-        Label: Sync + Copy + Into<Attributes>,
-        Attributes: Sync + Copy,
-    >(
+    fn explained_by_conditional_field<Label: Send + Sync + Copy + Into<u64>>(
         uncertainty_box: &[f32],
         point: &[f32],
         corrected_point: &[f32],
         start_position: usize,
         result: &Descriptor,
-        forest: &Box<U>,
-    ) -> Result<bool>
-    where
-        U: AugmentedRCF<Label, Attributes>,
-    {
+        forest: &RCFLarge<Label, u64>,
+    ) -> Result<bool> {
         let list = forest.near_neighbor_list(corrected_point, 50)?;
         let mut weight = 0;
         let total = list.len();
@@ -357,20 +343,13 @@ impl PredictorCorrector {
         }
     }
 
-    pub fn detect_and_modify<
-        U: ?Sized,
-        Label: Sync + Copy + Into<Attributes>,
-        Attributes: Sync + Copy,
-    >(
+    pub fn detect_and_modify<Label: Send + Sync + Copy + Into<u64>>(
         &mut self,
         result: &mut Descriptor,
         last_descriptor: &Descriptor,
         shingle_size: usize,
-        forest: &Box<U>,
-    ) -> Result<()>
-    where
-        U: AugmentedRCF<Label, Attributes>,
-    {
+        forest: &RCFLarge<Label, u64>,
+    ) -> Result<()> {
         match &result.rcf_point {
             None => return Ok(()),
             Some(point) => {

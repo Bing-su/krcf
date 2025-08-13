@@ -2,7 +2,7 @@ use crate::common::descriptor::Descriptor;
 use crate::common::deviation::Deviation;
 use crate::common::rangevector::RangeVector;
 use crate::rcf::RCFOptionsBuilder;
-use crate::rcf::{AugmentedRCF, RCFBuilder, RCFOptions, RCF};
+use crate::rcf::{AugmentedRCF, RCFBuilder, RCFLarge, RCFOptions};
 use crate::trcf::predictorcorrector::PredictorCorrector;
 use crate::trcf::preprocessor::{Preprocessor, PreprocessorBuilder};
 use crate::trcf::types::ForestMode::{STANDARD, STREAMING_IMPUTE, TIME_AUGMENTED};
@@ -16,7 +16,7 @@ use rand_chacha::ChaCha20Rng;
 use rand_core::SeedableRng;
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Bandit {
     id: u64,
     current_model: usize,
@@ -27,7 +27,7 @@ pub struct Bandit {
 }
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct State {
     pub id: u64,
     random_seed: u64,
@@ -141,19 +141,16 @@ impl State {
 }
 
 pub struct BasicTRCF {
-    rcf: Box<dyn RCF + Send + Sync>,
+    rcf: RCFLarge<u64, u64>,
     state: State,
 }
 
-pub fn core_process<U: ?Sized, Label: Sync + Copy + Into<Attributes>, Attributes: Sync + Copy>(
-    rcf: Option<&Box<U>>,
+pub fn core_process<Label: Send + Sync + Copy + Into<u64>>(
+    rcf: Option<&RCFLarge<Label, u64>>,
     state: &mut State,
     point: &[f32],
     timestamp: u64,
-) -> Result<Descriptor>
-where
-    U: AugmentedRCF<Label, Attributes>,
-{
+) -> Result<Descriptor> {
     let mut result = Descriptor::new(
         state.id,
         point,
@@ -244,6 +241,7 @@ impl BasicTRCF {
     }
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TRCFOptions {
     pub(crate) transform_decay: Option<f64>,
     pub(crate) transform_method: TransformMethod,
@@ -398,7 +396,7 @@ impl BasicTRCFBuilder {
             .bounding_box_cache_fraction(self.rcf_options.bounding_box_cache_fraction)
             .output_after(output_after)
             .initial_accept_fraction(self.rcf_options.initial_accept_fraction)
-            .build_default()?;
+            .build_large_simple::<u64>()?;
         let preprocessor = PreprocessorBuilder::new(self.input_dimensions, self.shingle_size)
             .transform_decay(transform_decay)
             .transform_method(self.trcf_options.transform_method)

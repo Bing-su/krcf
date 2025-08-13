@@ -9,7 +9,7 @@ use crate::types::Result;
 use crate::util::check_argument;
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct WeightedTransformer {
     transform_method: TransformMethod,
     deviations: Vec<Deviation>,

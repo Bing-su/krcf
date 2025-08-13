@@ -17,7 +17,7 @@ const MINIMUM_Z_FACTOR: f32 = 2.0;
 const DEFAULT_FACTOR_ADJUSTMENT_THRESHOLD: f32 = 0.9;
 
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BasicThresholder {
     elasticity: f32,
     count: i32,
