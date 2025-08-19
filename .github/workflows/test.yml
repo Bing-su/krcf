@@ -32,7 +32,7 @@ jobs:
           - windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
       - uses: astral-sh/setup-uv@v6
       - uses: mozilla-actions/sccache-action@v0.0.9
