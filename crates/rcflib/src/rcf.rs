@@ -1003,6 +1003,7 @@ impl RCFBuilder {
     }
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RCFOptions {
     pub(crate) id: u64,
     pub(crate) capacity: usize,
