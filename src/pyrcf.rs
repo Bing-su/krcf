@@ -120,8 +120,8 @@ pub struct RandomCutForestOptions {
     pub bounding_box_cache_fraction: Option<f64>,
 }
 
-impl RandomCutForestOptions {
-    fn to_rcf_options(&self) -> krcf::RandomCutForestOptions {
+impl Into<krcf::RandomCutForestOptions> for RandomCutForestOptions {
+    fn into(self) -> krcf::RandomCutForestOptions {
         krcf::RandomCutForestOptions {
             dimensions: self.dimensions,
             shingle_size: self.shingle_size,
@@ -177,7 +177,7 @@ pub struct RandomCutForest {
 impl RandomCutForest {
     #[new]
     pub fn new(options: RandomCutForestOptions) -> Result<Self> {
-        let rcf = krcf::RandomCutForest::new(options.to_rcf_options())?;
+        let rcf = krcf::RandomCutForest::new(options.clone().into())?;
         Ok(Self { rcf, options })
     }
 

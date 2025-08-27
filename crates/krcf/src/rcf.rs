@@ -70,6 +70,12 @@ impl Default for RandomCutForestOptions {
     }
 }
 
+impl Into<RCFBuilder> for RandomCutForestOptions {
+    fn into(self) -> RCFBuilder {
+        self.to_rcf_builder()
+    }
+}
+
 impl RandomCutForestOptions {
     /// Converts the `RandomCutForestOptions` into an `RCFBuilder`.
     ///
