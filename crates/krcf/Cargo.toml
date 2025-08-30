@@ -15,6 +15,7 @@ crate-type = ["lib"]
 anyhow = { workspace = true }
 krcflib = { workspace = true }
 serde = { workspace = true }
+multiversion = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

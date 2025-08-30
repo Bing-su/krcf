@@ -1,3 +1,4 @@
+use multiversion::multiversion;
 use rcflib::{
     common::{
         directionaldensity::InterpolationMeasure, divector::DiVector, rangevector::RangeVector,
@@ -132,6 +133,58 @@ impl RandomCutForestOptions {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RandomCutForest(RCFLarge<u64, u64>);
 
+#[multiversion(targets = "simd")]
+fn update(rcf: &mut RandomCutForest, point: &[f32]) -> Result<(), RCFError> {
+    rcf.0.update(point, 0)
+}
+
+#[multiversion(targets = "simd")]
+fn score(rcf: &RandomCutForest, point: &[f32]) -> Result<f64, RCFError> {
+    rcf.0.score(point)
+}
+
+#[multiversion(targets = "simd")]
+fn displacement_score(rcf: &RandomCutForest, point: &[f32]) -> Result<f64, RCFError> {
+    rcf.0.displacement_score(point)
+}
+
+#[multiversion(targets = "simd")]
+fn attribution(rcf: &RandomCutForest, point: &[f32]) -> Result<DiVector, RCFError> {
+    rcf.0.attribution(point)
+}
+
+#[multiversion(targets = "simd")]
+fn near_neighbor_list(
+    rcf: &RandomCutForest,
+    point: &[f32],
+    percentile: usize,
+) -> Result<Vec<(f64, Vec<f32>, f64)>, RCFError> {
+    rcf.0.near_neighbor_list(point, percentile)
+}
+
+#[multiversion(targets = "simd")]
+fn density(rcf: &RandomCutForest, point: &[f32]) -> Result<f64, RCFError> {
+    rcf.0.density(point)
+}
+
+#[multiversion(targets = "simd")]
+fn directional_density(rcf: &RandomCutForest, point: &[f32]) -> Result<DiVector, RCFError> {
+    rcf.0.directional_density(point)
+}
+
+#[multiversion(targets = "simd")]
+fn density_interpolant(
+    rcf: &RandomCutForest,
+    point: &[f32],
+) -> Result<InterpolationMeasure, RCFError> {
+    rcf.0.density_interpolant(point)
+}
+
+#[multiversion(targets = "simd")]
+pub fn extrapolate(rcf: &RandomCutForest, look_ahead: usize) -> Result<RangeVector<f32>, RCFError> {
+    rcf.0.extrapolate(look_ahead)
+}
+
 impl RandomCutForest {
     /// Creates a new `RandomCutForest` with the specified options.
     ///
@@ -166,7 +219,7 @@ impl RandomCutForest {
     ///
     /// * `point` - A slice of f32 representing the data point to add to the forest.
     pub fn update(&mut self, point: &[f32]) -> Result<(), RCFError> {
-        self.0.update(point, 0)
+        update(self, point)
     }
 
     /// Computes the anomaly score for a given data point.
@@ -177,7 +230,7 @@ impl RandomCutForest {
     ///
     /// * `point` - The data point to score.
     pub fn score(&self, point: &[f32]) -> Result<f64, RCFError> {
-        self.0.score(point)
+        score(self, point)
     }
 
     /// Computes the displacement score for a given data point.
@@ -188,7 +241,7 @@ impl RandomCutForest {
     ///
     /// * `point` - The data point to score.
     pub fn displacement_score(&self, point: &[f32]) -> Result<f64, RCFError> {
-        self.0.displacement_score(point)
+        displacement_score(self, point)
     }
 
     /// Computes the attribution of the anomaly score to each dimension of the data point.
@@ -197,7 +250,7 @@ impl RandomCutForest {
     ///
     /// * `point` - The data point for which to compute attribution.
     pub fn attribution(&self, point: &[f32]) -> Result<DiVector, RCFError> {
-        self.0.attribution(point)
+        attribution(self, point)
     }
 
     /// Finds a list of near neighbors for a given point.
@@ -211,7 +264,7 @@ impl RandomCutForest {
         point: &[f32],
         percentile: usize,
     ) -> Result<Vec<(f64, Vec<f32>, f64)>, RCFError> {
-        self.0.near_neighbor_list(point, percentile)
+        near_neighbor_list(self, point, percentile)
     }
 
     /// Estimates the density of the data at a given point.
@@ -220,7 +273,7 @@ impl RandomCutForest {
     ///
     /// * `point` - The point at which to estimate density.
     pub fn density(&self, point: &[f32]) -> Result<f64, RCFError> {
-        self.0.density(point)
+        density(self, point)
     }
 
     /// Computes the directional density of the data at a given point.
@@ -229,7 +282,7 @@ impl RandomCutForest {
     ///
     /// * `point` - The point at which to compute directional density.
     pub fn directional_density(&self, point: &[f32]) -> Result<DiVector, RCFError> {
-        self.0.directional_density(point)
+        directional_density(self, point)
     }
 
     /// Computes an interpolation measure for the density at a given point.
@@ -238,7 +291,7 @@ impl RandomCutForest {
     ///
     /// * `point` - The point for which to compute the density interpolant.
     pub fn density_interpolant(&self, point: &[f32]) -> Result<InterpolationMeasure, RCFError> {
-        self.0.density_interpolant(point)
+        density_interpolant(self, point)
     }
 
     /// Extrapolates future data points based on the current state of the model.
@@ -247,7 +300,7 @@ impl RandomCutForest {
     ///
     /// * `look_ahead` - The number of future time steps to extrapolate.
     pub fn extrapolate(&self, look_ahead: usize) -> Result<RangeVector<f32>, RCFError> {
-        self.0.extrapolate(look_ahead)
+        extrapolate(self, look_ahead)
     }
 
     /// Returns the number of dimensions of the data points in the forest.

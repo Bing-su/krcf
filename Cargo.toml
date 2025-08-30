@@ -11,6 +11,7 @@ repository = "https://github.com/Bing-su/krcf"
 anyhow = "1"
 krcflib = { path = "./crates/rcflib", version = "4" }
 krcf = { path = "./crates/krcf", version = "<1" }
+multiversion = "0.8"
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

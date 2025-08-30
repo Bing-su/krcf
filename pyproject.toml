@@ -20,6 +20,7 @@ test = [
     "hypothesis[pytest,numpy]",
     "pytest-pretty",
     "pytest-xdist",
+    "pytest-benchmark",
     "syrupy",
     "jsonpickle",
 ]
