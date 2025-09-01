@@ -31,7 +31,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = { workspace = true }
-pyo3 = { version = "*", features = [
+pyo3 = { version = "0.26", features = [
     "extension-module",
     "generate-import-lib",
     "anyhow",
