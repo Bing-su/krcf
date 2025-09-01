@@ -1,6 +1,6 @@
 [package]
 name = "krcflib"
-version = "4.0.0"
+version = "4.0.1"
 edition = "2021"
 license = "Apache-2.0"
 description = "Modified https://github.com/aws/random-cut-forest-by-aws"
