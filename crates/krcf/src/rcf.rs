@@ -134,6 +134,11 @@ impl RandomCutForestOptions {
 pub struct RandomCutForest(RCFLarge<u64, u64>);
 
 #[multiversion(targets = "simd")]
+fn shingled_point(rcf: &RandomCutForest, point: &[f32]) -> Result<Vec<f32>, RCFError> {
+    rcf.0.shingled_point(point)
+}
+
+#[multiversion(targets = "simd")]
 fn update(rcf: &mut RandomCutForest, point: &[f32]) -> Result<(), RCFError> {
     rcf.0.update(point, 0)
 }
@@ -210,7 +215,7 @@ impl RandomCutForest {
     ///
     /// A `Result` containing the shingled point as a `Vec<f32>` or an `RCFError`.
     pub fn shingled_point(&self, point: &[f32]) -> Result<Vec<f32>, RCFError> {
-        self.0.shingled_point(point)
+        shingled_point(self, point)
     }
 
     /// Updates the forest with a new data point.
