@@ -12,7 +12,6 @@ name = "krcf"
 crate-type = ["lib"]
 
 [dependencies]
-anyhow = { workspace = true }
 krcflib = { workspace = true }
 serde = { workspace = true }
 multiversion = { workspace = true }
