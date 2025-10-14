@@ -1,6 +1,6 @@
 import nox
 
-python = ["3.9", "3.13", "3.13t", "pypy3.11"]
+python = ["3.9", "3.14", "3.14t", "pypy3.11"]
 venv_backend = "uv"
 
 
