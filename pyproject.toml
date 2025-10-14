@@ -23,6 +23,7 @@ test = [
     "pytest-benchmark",
     "syrupy",
     "jsonpickle",
+    "msgpack",
 ]
 
 [project.urls]

@@ -11,6 +11,7 @@ from fractions import Fraction
 from typing import Any, Callable
 
 import jsonpickle
+import msgpack
 import numpy as np
 import pytest
 from hypothesis import assume, given, settings
@@ -138,22 +139,46 @@ def test_to_json():
         "id": 1000000007,
     }
     forest = RandomCutForest(opts)
-    json_str = forest.to_json()
-    assert isinstance(json_str, str)
+    for _ in range(10):
+        forest.update(np.random.random(5))
+    raw = forest.to_json()
+    assert isinstance(raw, str)
 
-    json_data = json.loads(json_str)
-    assert isinstance(json_data, dict)
-    assert "options" in json_data
-    assert isinstance(json_data["options"], dict)
-    assert json_data["options"]["dimensions"] == opts["dimensions"]
-    assert json_data["options"]["shingle_size"] == opts["shingle_size"]
-    assert json_data["options"]["output_after"] == opts["output_after"]
-    assert json_data["options"]["id"] == opts["id"]
+    data = json.loads(raw)
+    assert isinstance(data, dict)
+    assert "options" in data
+    assert isinstance(data["options"], dict)
+    assert data["options"]["dimensions"] == opts["dimensions"]
+    assert data["options"]["shingle_size"] == opts["shingle_size"]
+    assert data["options"]["output_after"] == opts["output_after"]
+    assert data["options"]["id"] == opts["id"]
 
-    assert "rcf" in json_data
-    assert isinstance(json_data["rcf"], dict)
+    assert "rcf" in data
+    assert isinstance(data["rcf"], dict)
 
-    forest2 = RandomCutForest.from_json(json_str)
+    forest2 = RandomCutForest.from_json(raw)
+    assert isinstance(forest2, RandomCutForest)
+    assert forest2.options().get("id") == opts["id"]
+
+
+def test_to_msgpack():
+    opts: RandomCutForestOptions = {
+        "dimensions": 5,
+        "shingle_size": 3,
+        "output_after": 256,
+        "id": 1000000007,
+    }
+    forest = RandomCutForest(opts)
+    for _ in range(10):
+        forest.update(np.random.random(5))
+    raw = forest.to_msgpack()
+    assert isinstance(raw, bytes)
+
+    data = msgpack.unpackb(raw)
+    assert isinstance(data, list)
+    assert len(data) == 2
+
+    forest2 = RandomCutForest.from_msgpack(raw)
     assert isinstance(forest2, RandomCutForest)
     assert forest2.options().get("id") == opts["id"]
 
