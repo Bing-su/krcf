@@ -88,7 +88,7 @@ known-first-party = ["krcf"]
 build-frontend = "build[uv]"
 test-extras = ["test"]
 test-command = "pytest -n 2 {project}"
-enable = ["pypy"]
+enable = ["pypy", "graalpy"]
 test-skip = ["cp39-win_arm64", "cp310-win_arm64"]
 
 [tool.cibuildwheel.macos]
