@@ -50,7 +50,7 @@ jobs:
 
       - run: ls wheelhouse
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl
@@ -88,7 +88,7 @@ jobs:
 
       - run: ls dist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: wheels-riscv64-${{ strategy.job-index }}
           path: ./dist/*.whl
@@ -110,7 +110,7 @@ jobs:
 
       - run: ls dist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: sdist
           path: ./dist/*.tar.gz
@@ -130,7 +130,7 @@ jobs:
       # Used to generate artifact attestation
       attestations: write
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           path: dist
           merge-multiple: true
