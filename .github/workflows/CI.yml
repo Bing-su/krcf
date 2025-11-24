@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - uses: hustcer/setup-nu@v3
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - uses: docker/setup-qemu-action@v3
         if: runner.os == 'Linux'
@@ -46,7 +46,7 @@ jobs:
         run: echo "CIBW_ARCHS=${{ matrix.cibw-archs }}" | save -a $env.GITHUB_ENV
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.2
+        uses: pypa/cibuildwheel@v3.3
 
       - run: ls wheelhouse
 
@@ -75,7 +75,7 @@ jobs:
 
     steps:
       - uses: hustcer/setup-nu@v3
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
         with:
           target: ${{ matrix.target }}
@@ -101,7 +101,7 @@ jobs:
         shell: nu {0}
     steps:
       - uses: hustcer/setup-nu@v3
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - uses: astral-sh/setup-uv@v7
 
