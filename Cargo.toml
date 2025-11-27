@@ -1,52 +1,52 @@
+[package]
+name = "krcf_py"
+version = { workspace = true }
+edition = { workspace = true }
+description = "Python bindings for AWS's rust Random Cut Forest implementation"
+repository = { workspace = true }
+license = { workspace = true }
+
 [workspace]
-members = ["crates/*", "."]
+members = [".", "crates/*"]
 
 [workspace.package]
-edition = "2024"
 version = "0.3.1"
-license = "Apache-2.0"
+edition = "2024"
 repository = "https://github.com/Bing-su/krcf"
+license = "Apache-2.0"
 
 [workspace.dependencies]
 anyhow = "1"
-krcflib = { path = "./crates/rcflib", version = "4" }
 krcf = { path = "./crates/krcf", version = "<1" }
+krcflib = { path = "./crates/rcflib", version = "4" }
 multiversion = "0.8"
 rmp-serde = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
-[package]
-name = "krcf_py"
-version = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
-repository = { workspace = true }
-description = "Python bindings for AWS's rust Random Cut Forest implementation"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
-name = "krcf"
 crate-type = ["cdylib"]
+name = "krcf"
 
 [dependencies]
 anyhow = { workspace = true }
-pyo3 = { version = "0.27", features = [
-    "extension-module",
-    "generate-import-lib",
-    "anyhow",
-] }
-krcflib = { workspace = true }
 krcf = { workspace = true }
+krcflib = { workspace = true }
+pyo3 = { version = "0.27", features = [
+  "anyhow",
+  "extension-module",
+  "generate-import-lib",
+] }
 rmp-serde = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 
 [profile.release]
-codegen-units = 1
-lto = true
-strip = true
 split-debuginfo = "packed"
+strip = true
+lto = true
+codegen-units = 1
 
 [profile.test]
 opt-level = 3
