@@ -267,7 +267,7 @@ impl RandomCutForest {
     }
 
     pub fn to_msgpack(&self) -> Result<Vec<u8>> {
-        Ok(rmp_serde::to_vec(self)?)
+        Ok(rmp_serde::to_vec_named(self)?)
     }
 
     #[classmethod]
@@ -294,7 +294,7 @@ impl RandomCutForest {
     }
 
     fn __getstate__(&self) -> Result<Vec<u8>> {
-        Ok(rmp_serde::to_vec(&self)?)
+        Ok(rmp_serde::to_vec_named(&self)?)
     }
 
     fn __setstate__(&mut self, state: Vec<u8>) -> Result<()> {

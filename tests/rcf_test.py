@@ -175,8 +175,16 @@ def test_to_msgpack():
     assert isinstance(raw, bytes)
 
     data = msgpack.unpackb(raw)
-    assert isinstance(data, list)
-    assert len(data) == 2
+    assert isinstance(data, dict)
+    assert "options" in data
+    assert isinstance(data["options"], dict)
+    assert data["options"]["dimensions"] == opts["dimensions"]
+    assert data["options"]["shingle_size"] == opts["shingle_size"]
+    assert data["options"]["output_after"] == opts["output_after"]
+    assert data["options"]["id"] == opts["id"]
+
+    assert "rcf" in data
+    assert isinstance(data["rcf"], dict)
 
     forest2 = RandomCutForest.from_msgpack(raw)
     assert isinstance(forest2, RandomCutForest)
