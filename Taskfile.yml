@@ -20,7 +20,7 @@ tasks:
 
   update:pre-commit:
     cmds:
-      - pre-commit autoupdate --jobs 5
+      - prek auto-update
     desc: Update pre-commit hooks
 
   update:
