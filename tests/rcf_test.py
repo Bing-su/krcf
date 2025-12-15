@@ -5,10 +5,11 @@ import json
 import pickle
 import platform
 from collections import UserList
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal
 from fractions import Fraction
-from typing import Any, Callable
+from typing import Any
 
 import jsonpickle
 import msgpack

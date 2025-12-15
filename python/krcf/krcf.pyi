@@ -12,7 +12,9 @@ from .types import DiVector, InterpolationMeasure, NearNeighbor, RangeVector
 if sys.version_info >= (3, 11):
     from typing import Self, TypeAlias
 else:
-    from typing_extensions import Self, TypeAlias
+    from typing import TypeAlias
+
+    from typing_extensions import Self
 
 __version__: str
 
