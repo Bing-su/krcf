@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from collections.abc import Sequence
-from typing import SupportsFloat
+from typing import SupportsFloat, TypeAlias
 
 import numpy as np
 
@@ -10,10 +10,8 @@ from .options import RandomCutForestOptions
 from .types import DiVector, InterpolationMeasure, NearNeighbor, RangeVector
 
 if sys.version_info >= (3, 11):
-    from typing import Self, TypeAlias
+    from typing import Self
 else:
-    from typing import TypeAlias
-
     from typing_extensions import Self
 
 __version__: str
