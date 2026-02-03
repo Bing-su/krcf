@@ -36,7 +36,7 @@ pub fn l2distance(a: &[f32], b: &[f32]) -> f64 {
     f64::sqrt(
         a.iter()
             .zip(b)
-            .map(|(&x, &y)| (abs(x as f64 - y as f64) * abs(x as f64 - y as f64)))
+            .map(|(&x, &y)| abs(x as f64 - y as f64) * abs(x as f64 - y as f64) )
             .sum(),
     )
 }
