@@ -1,6 +1,6 @@
 [package]
 name = "krcflib"
-version = "4.0.1"
+version = "4.0.2"
 edition = "2021"
 description = "Modified https://github.com/aws/random-cut-forest-by-aws"
 repository = { workspace = true }
