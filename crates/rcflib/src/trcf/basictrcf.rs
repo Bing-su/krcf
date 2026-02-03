@@ -11,9 +11,8 @@ use crate::trcf::types::TransformMethod::NORMALIZE;
 use crate::trcf::types::{ForestMode, ScoringStrategy, TransformMethod};
 use crate::types::Result;
 use crate::util::check_argument;
-use rand::Rng;
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
-use rand_core::SeedableRng;
 
 #[repr(C)]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

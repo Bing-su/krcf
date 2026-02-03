@@ -3,7 +3,7 @@ extern crate rand_chacha;
 extern crate rcflib;
 use crate::rcflib::rcf::RCFOptionsBuilder;
 use crate::rcflib::trcf::basictrcf::TRCFOptionsBuilder;
-use rand::{Rng, SeedableRng};
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
 use rcflib::trcf::basictrcf::BasicTRCFBuilder;
 use rcflib::trcf::types::ForestMode::STANDARD;

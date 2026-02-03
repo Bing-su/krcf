@@ -3,9 +3,8 @@ extern crate rand;
 extern crate rand_chacha;
 use std::f32::consts::PI;
 
-use rand::SeedableRng;
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
-use rand_core::RngCore;
 
 use crate::rand::Rng;
 use crate::types::Result;

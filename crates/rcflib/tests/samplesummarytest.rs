@@ -5,9 +5,8 @@ extern crate rcflib;
 use num::abs;
 /// try cargo test --release
 /// these tests are designed to be longish
-use rand::{prelude::ThreadRng, Rng, SeedableRng};
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
-use rand_core::RngCore;
 use rcflib::common::samplesummary::multi_summarize_ref;
 use rcflib::{
     common::{multidimdatawithkey::MultiDimDataWithKey, samplesummary::summarize},

@@ -1,8 +1,7 @@
 use crate::samplerplustree::boundingbox::BoundingBox;
 use crate::util::{maxf32, minf32};
-use rand::Rng;
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
-use rand_core::SeedableRng;
 
 /**
 *  this is a class that helps manage the cut information; the nodes do not store information in

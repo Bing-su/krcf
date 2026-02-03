@@ -1,8 +1,7 @@
 use crate::types::Result;
 use crate::util::check_argument;
-use rand::{Rng, SeedableRng};
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
-use rand_core::RngCore;
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 use std::cmp::max;
 use std::ops::Index;

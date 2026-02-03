@@ -2,9 +2,8 @@ extern crate rand;
 extern crate rand_chacha;
 extern crate rcflib;
 
-use rand::Rng;
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
-use rand_core::SeedableRng;
 use rcflib::common::deviation::Deviation;
 use rcflib::common::multidimdatawithkey;
 use rcflib::rcf::RCFOptionsBuilder;

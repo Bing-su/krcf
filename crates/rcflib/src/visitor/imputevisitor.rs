@@ -1,5 +1,5 @@
 use num::abs;
-use rand::{Rng, SeedableRng};
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
 
 use crate::util::check_argument;

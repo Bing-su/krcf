@@ -5,9 +5,8 @@ extern crate rand_chacha;
 use core::fmt::Debug;
 use std::hash::Hash;
 
-use rand::SeedableRng;
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
-use rand_core::RngCore;
 use rayon::prelude::*;
 
 use crate::common::rangevector::RangeVector;

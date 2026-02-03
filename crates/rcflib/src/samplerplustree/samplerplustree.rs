@@ -4,9 +4,8 @@ extern crate rand_chacha;
 use std::fmt::Debug;
 use std::hash::Hash;
 
-use rand::{Rng, SeedableRng};
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
-use rand_core::RngCore;
 
 use crate::{
     pointstore::PointStore,

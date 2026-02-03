@@ -9,8 +9,8 @@ use crate::trcf::types::ScoringStrategy::EXPECTED_INVERSE_HEIGHT;
 use crate::trcf::types::{ScoringStrategy, TransformMethod};
 use crate::types::Result;
 use crate::util::{check_argument, maxf32};
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
-use rand_core::SeedableRng;
 use rayon::prelude::*;
 use std::collections::HashMap;
 

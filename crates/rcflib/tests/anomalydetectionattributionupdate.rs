@@ -3,7 +3,7 @@ extern crate rand_chacha;
 extern crate rcflib;
 
 use num::abs;
-use rand::{Rng, SeedableRng};
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
 use rcflib::common::multidimdatawithkey::MultiDimDataWithKey;
 use rcflib::rcf::{RCFBuilder, RCFOptionsBuilder};

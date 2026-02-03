@@ -4,7 +4,7 @@ extern crate rcflib;
 
 use std::f32::consts::PI;
 
-use rand::{Rng, SeedableRng};
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
 use rcflib::common::multidimdatawithkey::MultiDimDataWithKey;
 use rcflib::rcf::{RCFBuilder, RCFOptionsBuilder};

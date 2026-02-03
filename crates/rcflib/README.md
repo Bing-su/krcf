@@ -32,7 +32,7 @@ Then, you can use it in your code like this:
 (note: package name is `krcflib`, but you should import it as `rcflib`)
 
 ```rust
-use rand::{Rng, SeedableRng};
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
 use rcflib::common::multidimdatawithkey;
 use rcflib::rcf::RCFBuilder;

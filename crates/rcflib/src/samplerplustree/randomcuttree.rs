@@ -1,9 +1,8 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 
-use rand::{Rng, SeedableRng};
+use rand::prelude::*;
 use rand_chacha::ChaCha20Rng;
-use rand_core::RngCore;
 
 use crate::errors::RCFError;
 use crate::util::check_argument;
