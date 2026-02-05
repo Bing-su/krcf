@@ -33,7 +33,7 @@ name = "krcf"
 anyhow = { workspace = true }
 krcf = { workspace = true }
 krcflib = { workspace = true }
-pyo3 = { version = "0.27", features = [
+pyo3 = { version = "0.28", features = [
   "anyhow",
   "extension-module",
   "generate-import-lib",

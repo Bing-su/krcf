@@ -166,7 +166,7 @@ impl Default for RandomCutForestOptions {
     }
 }
 
-#[pyclass(module = "krcf.krcf", str)]
+#[pyclass(module = "krcf.krcf", str, from_py_object)]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RandomCutForest {
     pub rcf: krcf::RandomCutForest,
