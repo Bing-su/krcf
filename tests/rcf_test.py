@@ -5,11 +5,10 @@ import json
 import pickle
 import platform
 from collections import UserList
-from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal
 from fractions import Fraction
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import jsonpickle
 import msgpack
@@ -20,6 +19,9 @@ from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays
 
 from krcf import RandomCutForest, RandomCutForestOptions
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 @st.composite
