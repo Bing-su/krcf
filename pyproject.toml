@@ -33,7 +33,7 @@ test = [
 dev = ["nox[uv]", "typing-extensions"]
 
 [build-system]
-requires = ["maturin>=1.10,<2.0"]
+requires = ["maturin>=1.12,<2.0"]
 build-backend = "maturin"
 
 [tool.cibuildwheel]
