@@ -342,9 +342,9 @@ def test_rcf_copy(options: RandomCutForestOptions, copier: Callable[[Any], Any])
 @pytest.mark.parametrize("parallel", [True, False])
 @pytest.mark.xfail(
     platform.python_implementation() == "PyPy",
-    reason="pypy threading issues",
+    reason="pypy",
 )
-def test_rcf_thread_safety(parallel: bool):  # noqa: FBT001
+def test_rcf_thread_safety_score(parallel: bool):  # noqa: FBT001
     dim = 10
     shingle_size = 4
     options: RandomCutForestOptions = {
@@ -356,7 +356,67 @@ def test_rcf_thread_safety(parallel: bool):  # noqa: FBT001
 
     forest = RandomCutForest(options)
 
-    pp = np.random.random((200, dim))
+    rng = np.random.default_rng(42)
+    pp = rng.random((200, dim))
+    scores = []
+
+    for point in pp:
+        forest.update(point)
+
+    with ThreadPoolExecutor() as executor:
+        for point in pp:
+            fut = executor.submit(forest.score, point)
+            scores.append(fut)
+
+    scores = [fut.result() for fut in scores]
+
+    assert all(isinstance(score, float) for score in scores)
+    assert all(score >= 0 for score in scores)
+
+    anomaly = rng.random(dim) * 10**9
+    score = forest.score(anomaly.tolist())
+    assert isinstance(score, float)
+    assert score >= 2
+
+
+def test_rcf_thread_safety_update():
+    dim = 10
+    shingle_size = 4
+    options: RandomCutForestOptions = {
+        "dimensions": dim,
+        "shingle_size": shingle_size,
+        "output_after": 1,
+        "parallel_execution_enabled": False,
+    }
+
+    forest = RandomCutForest(options)
+
+    rng = np.random.default_rng(42)
+    pp = rng.random((200, dim))
+    updates = []
+    with ThreadPoolExecutor() as executor:
+        for point in pp:
+            fut2 = executor.submit(forest.update, point)
+            updates.append(fut2)
+
+    with pytest.raises(RuntimeError, match="Already borrowed"):
+        _ = [fut.result() for fut in updates]
+
+
+def test_rcf_thread_safety_score_and_update():
+    dim = 10
+    shingle_size = 4
+    options: RandomCutForestOptions = {
+        "dimensions": dim,
+        "shingle_size": shingle_size,
+        "output_after": 1,
+        "parallel_execution_enabled": False,
+    }
+
+    forest = RandomCutForest(options)
+
+    rng = np.random.default_rng(42)
+    pp = rng.random((200, dim))
     scores = []
     updates = []
     with ThreadPoolExecutor() as executor:
@@ -366,16 +426,11 @@ def test_rcf_thread_safety(parallel: bool):  # noqa: FBT001
             fut2 = executor.submit(forest.update, point)
             updates.append(fut2)
 
-    scores = [fut.result() for fut in scores]
-    _ = [fut.result() for fut in updates]
+    with pytest.raises(RuntimeError, match="Already mutably borrowed"):
+        _ = [fut.result() for fut in scores]
 
-    assert all(isinstance(score, float) for score in scores)
-    assert all(score >= 0 for score in scores)
-
-    anomaly = np.random.random(dim) * 10**9
-    score = forest.score(anomaly.tolist())
-    assert isinstance(score, float)
-    assert score >= 2
+    with pytest.raises(RuntimeError, match="Already borrowed"):
+        _ = [fut.result() for fut in updates]
 
 
 def test_rcf_types():

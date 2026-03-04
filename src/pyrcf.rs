@@ -185,45 +185,50 @@ impl RandomCutForest {
         Ok(self.rcf.shingled_point(&point)?)
     }
 
-    pub fn update(&mut self, point: Vec<f32>) -> Result<()> {
-        Ok(self.rcf.update(&point)?)
+    pub fn update(&mut self, py: Python<'_>, point: Vec<f32>) -> Result<()> {
+        py.detach(|| Ok(self.rcf.update(&point)?))
     }
 
-    pub fn score(&self, point: Vec<f32>) -> Result<f64> {
-        Ok(self.rcf.score(&point)?)
+    pub fn score(&self, py: Python<'_>, point: Vec<f32>) -> Result<f64> {
+        py.detach(|| Ok(self.rcf.score(&point)?))
     }
 
-    pub fn displacement_score(&self, point: Vec<f32>) -> Result<f64> {
-        Ok(self.rcf.displacement_score(&point)?)
+    pub fn displacement_score(&self, py: Python<'_>, point: Vec<f32>) -> Result<f64> {
+        py.detach(|| Ok(self.rcf.displacement_score(&point)?))
     }
 
-    pub fn attribution(&self, point: Vec<f32>) -> Result<DiVector> {
-        Ok(self.rcf.attribution(&point)?.into())
+    pub fn attribution(&self, py: Python<'_>, point: Vec<f32>) -> Result<DiVector> {
+        py.detach(|| Ok(self.rcf.attribution(&point)?.into()))
     }
 
     pub fn near_neighbor_list(
         &self,
+        py: Python<'_>,
         point: Vec<f32>,
         percentile: usize,
     ) -> Result<Vec<NearNeighbor>> {
-        let list = self.rcf.near_neighbor_list(&point, percentile)?;
+        let list = py.detach(|| self.rcf.near_neighbor_list(&point, percentile))?;
         Ok(list.into_iter().map(NearNeighbor::from).collect())
     }
 
-    pub fn density(&self, point: Vec<f32>) -> Result<f64> {
-        Ok(self.rcf.density(&point)?)
+    pub fn density(&self, py: Python<'_>, point: Vec<f32>) -> Result<f64> {
+        py.detach(|| Ok(self.rcf.density(&point)?))
     }
 
-    pub fn directional_density(&self, point: Vec<f32>) -> Result<DiVector> {
-        Ok(self.rcf.directional_density(&point)?.into())
+    pub fn directional_density(&self, py: Python<'_>, point: Vec<f32>) -> Result<DiVector> {
+        py.detach(|| Ok(self.rcf.directional_density(&point)?.into()))
     }
 
-    pub fn density_interpolant(&self, point: Vec<f32>) -> Result<InterpolationMeasure> {
-        Ok(self.rcf.density_interpolant(&point)?.into())
+    pub fn density_interpolant(
+        &self,
+        py: Python<'_>,
+        point: Vec<f32>,
+    ) -> Result<InterpolationMeasure> {
+        py.detach(|| Ok(self.rcf.density_interpolant(&point)?.into()))
     }
 
-    pub fn extrapolate(&self, look_ahead: usize) -> Result<RangeVector> {
-        Ok(self.rcf.extrapolate(look_ahead)?.into())
+    pub fn extrapolate(&self, py: Python<'_>, look_ahead: usize) -> Result<RangeVector> {
+        py.detach(|| Ok(self.rcf.extrapolate(look_ahead)?.into()))
     }
 
     pub fn dimensions(&self) -> usize {
