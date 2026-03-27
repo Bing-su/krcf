@@ -68,14 +68,17 @@ jobs:
         include:
           - target: riscv64gc-unknown-linux-gnu
             manylinux: auto
-            args: --out dist
+            args: --out dist --interpreter 3.10 3.14t
           - target: riscv64gc-unknown-linux-musl
             manylinux: musllinux_1_2
-            args: --out dist --zig
+            args: --out dist --zig --interpreter 3.10 3.14t
 
     steps:
       - uses: hustcer/setup-nu@v3
       - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
       - uses: dtolnay/rust-toolchain@stable
         with:
           target: ${{ matrix.target }}
@@ -90,7 +93,7 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: wheels-riscv64-${{ strategy.job-index }}
+          name: wheels-${{ matrix.target }}-${{ strategy.job-index }}
           path: ./dist/*.whl
           if-no-files-found: error
 
@@ -123,12 +126,9 @@ jobs:
     needs: [wheel, wheel-riscv64, sdist]
     environment: publish
     permissions:
-      # Use to sign the release artifacts
       id-token: write
-      # Used to upload release artifacts
-      contents: write
-      # Used to generate artifact attestation
       attestations: write
+      artifact-metadata: write
     steps:
       - uses: actions/download-artifact@v8
         with:
