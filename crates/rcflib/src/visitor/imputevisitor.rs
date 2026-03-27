@@ -1,6 +1,6 @@
 use num::abs;
 use rand::prelude::*;
-use rand_chacha::ChaCha20Rng;
+use rand::rngs::ChaCha20Rng;
 
 use crate::util::check_argument;
 use crate::{

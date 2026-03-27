@@ -17,9 +17,7 @@ path = "src/example.rs"
 
 [dependencies]
 num = ">=0.4, <1"
-rand = "^0.9"
-rand_chacha = "^0.9"
-rand_core = "^0.9"
+rand = { version = "^0.10", features = ["chacha", "serde"] }
 rayon = "1"
 serde = { workspace = true }
 

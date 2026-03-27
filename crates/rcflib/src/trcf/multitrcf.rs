@@ -10,7 +10,7 @@ use crate::trcf::types::{ScoringStrategy, TransformMethod};
 use crate::types::Result;
 use crate::util::{check_argument, maxf32};
 use rand::prelude::*;
-use rand_chacha::ChaCha20Rng;
+use rand::rngs::ChaCha20Rng;
 use rayon::prelude::*;
 use std::collections::HashMap;
 
@@ -290,7 +290,6 @@ impl MultiTRCFBuilder {
             "forest mode not supported",
         )?;
         let mut random_seed = self.rcf_options.random_seed.unwrap_or({
-            use rand::RngCore;
             let seed = rand::rng().next_u64();
             ChaCha20Rng::seed_from_u64(seed).next_u64()
         });

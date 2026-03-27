@@ -1,10 +1,9 @@
 extern crate rand;
 
-extern crate rand_chacha;
 use std::f32::consts::PI;
 
 use rand::prelude::*;
-use rand_chacha::ChaCha20Rng;
+use rand::rngs::ChaCha20Rng;
 
 use crate::rand::Rng;
 use crate::types::Result;

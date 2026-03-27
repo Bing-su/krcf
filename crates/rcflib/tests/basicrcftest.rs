@@ -1,5 +1,4 @@
 extern crate rand;
-extern crate rand_chacha;
 extern crate rcflib;
 
 use num::abs;

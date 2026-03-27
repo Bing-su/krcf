@@ -1,12 +1,10 @@
 extern crate rand;
-extern crate rand_chacha;
 extern crate rcflib;
 
 /// try cargo test --release
 /// these tests are designed to be longish
 use rand::prelude::*;
-use rand_chacha::ChaCha20Rng;
-use rand_core::RngCore;
+use rand::rngs::ChaCha20Rng;
 use rcflib::common::cluster::MultiCenter;
 use rcflib::common::multidimdatawithkey::new_vec;
 use rcflib::glad::GlobalLocalAnomalyDetector;

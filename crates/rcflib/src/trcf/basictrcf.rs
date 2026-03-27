@@ -12,7 +12,7 @@ use crate::trcf::types::{ForestMode, ScoringStrategy, TransformMethod};
 use crate::types::Result;
 use crate::util::check_argument;
 use rand::prelude::*;
-use rand_chacha::ChaCha20Rng;
+use rand::rngs::ChaCha20Rng;
 
 #[repr(C)]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

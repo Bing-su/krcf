@@ -1,12 +1,11 @@
 extern crate num;
 extern crate rand;
-extern crate rand_chacha;
 
 use core::fmt::Debug;
 use std::hash::Hash;
 
 use rand::prelude::*;
-use rand_chacha::ChaCha20Rng;
+use rand::rngs::ChaCha20Rng;
 use rayon::prelude::*;
 
 use crate::common::rangevector::RangeVector;

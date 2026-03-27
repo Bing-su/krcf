@@ -1,12 +1,11 @@
 extern crate rand;
-extern crate rand_chacha;
 extern crate rcflib;
 
 use num::abs;
 /// try cargo test --release
 /// these tests are designed to be longish
 use rand::prelude::*;
-use rand_chacha::ChaCha20Rng;
+use rand::rngs::ChaCha20Rng;
 use rcflib::common::cluster::{
     multi_cluster_as_object_with_weight_array, multi_cluster_as_ref, multi_cluster_as_weighted_ref,
     multi_cluster_obj, persist, single_centroid_cluster_slice_with_weight_arrays,
