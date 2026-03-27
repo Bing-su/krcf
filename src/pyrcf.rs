@@ -1,5 +1,4 @@
 use anyhow::Result;
-use krcf;
 use pyo3::prelude::*;
 use rcflib::common::{directionaldensity, divector, rangevector};
 
@@ -120,25 +119,25 @@ pub struct RandomCutForestOptions {
     pub bounding_box_cache_fraction: Option<f64>,
 }
 
-impl Into<krcf::RandomCutForestOptions> for RandomCutForestOptions {
-    fn into(self) -> krcf::RandomCutForestOptions {
+impl From<RandomCutForestOptions> for krcf::RandomCutForestOptions {
+    fn from(val: RandomCutForestOptions) -> Self {
         krcf::RandomCutForestOptions {
-            dimensions: self.dimensions,
-            shingle_size: self.shingle_size,
-            id: self.id,
-            num_trees: self.num_trees,
-            sample_size: self.sample_size,
-            output_after: self.output_after,
-            random_seed: self.random_seed,
-            parallel_execution_enabled: self.parallel_execution_enabled,
-            lambda: self.lambda,
-            internal_rotation: self.internal_rotation,
-            internal_shingling: self.internal_shingling,
-            propagate_attribute_vectors: self.propagate_attribute_vectors,
-            store_pointsum: self.store_pointsum,
-            store_attributes: self.store_attributes,
-            initial_accept_fraction: self.initial_accept_fraction,
-            bounding_box_cache_fraction: self.bounding_box_cache_fraction,
+            dimensions: val.dimensions,
+            shingle_size: val.shingle_size,
+            id: val.id,
+            num_trees: val.num_trees,
+            sample_size: val.sample_size,
+            output_after: val.output_after,
+            random_seed: val.random_seed,
+            parallel_execution_enabled: val.parallel_execution_enabled,
+            lambda: val.lambda,
+            internal_rotation: val.internal_rotation,
+            internal_shingling: val.internal_shingling,
+            propagate_attribute_vectors: val.propagate_attribute_vectors,
+            store_pointsum: val.store_pointsum,
+            store_attributes: val.store_attributes,
+            initial_accept_fraction: val.initial_accept_fraction,
+            bounding_box_cache_fraction: val.bounding_box_cache_fraction,
         }
     }
 }
