@@ -66,7 +66,7 @@ fn impute_different_period() {
             error += next_values
                 .iter()
                 .zip(&data_with_key.data[i])
-                .map(|(x, y)| (x - y) as f64 * (x - y) as f64 )
+                .map(|(x, y)| (x - y) as f64 * (x - y) as f64)
                 .sum::<f64>();
             count += base_dimension;
         }
