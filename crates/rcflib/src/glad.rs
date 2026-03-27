@@ -4,7 +4,7 @@ use crate::trcf::basicthresholder::BasicThresholder;
 use crate::types::Result;
 use crate::util::check_argument;
 use rand::prelude::*;
-use rand_chacha::ChaCha20Rng;
+use rand::rngs::ChaCha20Rng;
 
 pub const DEFAULT_MAX_CLUSTERS: usize = 10;
 pub const SCORE_MAX: f32 = 10.0;

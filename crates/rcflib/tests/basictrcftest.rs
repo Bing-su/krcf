@@ -1,10 +1,9 @@
 extern crate rand;
-extern crate rand_chacha;
 extern crate rcflib;
 use crate::rcflib::rcf::RCFOptionsBuilder;
 use crate::rcflib::trcf::basictrcf::TRCFOptionsBuilder;
 use rand::prelude::*;
-use rand_chacha::ChaCha20Rng;
+use rand::rngs::ChaCha20Rng;
 use rcflib::trcf::basictrcf::BasicTRCFBuilder;
 use rcflib::trcf::types::ForestMode::STANDARD;
 use rcflib::trcf::types::TransformMethod;
@@ -190,7 +189,7 @@ fn trcf_scale(
         .build()
         .unwrap();
 
-    let mut rng = ChaCha20Rng::from_os_rng();
+    let mut rng = rand::rng();
     let mut amplitude = Vec::new();
     for _i in 0..base_dimension {
         let val: f32 = rng.random();

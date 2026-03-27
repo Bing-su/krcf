@@ -10,7 +10,6 @@ mod util;
 pub mod visitor;
 
 extern crate rand;
-extern crate rand_chacha;
 
 use num::abs;
 

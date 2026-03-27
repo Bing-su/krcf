@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use std::hash::Hash;
 
 use rand::prelude::*;
-use rand_chacha::ChaCha20Rng;
+use rand::rngs::ChaCha20Rng;
 
 use crate::errors::RCFError;
 use crate::util::check_argument;
@@ -22,7 +22,6 @@ use crate::{
 };
 
 extern crate rand;
-extern crate rand_chacha;
 
 #[repr(C)]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

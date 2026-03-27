@@ -1,9 +1,8 @@
 extern crate rand;
-extern crate rand_chacha;
 extern crate rcflib;
 
 use rand::prelude::*;
-use rand_chacha::ChaCha20Rng;
+use rand::rngs::ChaCha20Rng;
 use rcflib::common::multidimdatawithkey::MultiDimDataWithKey;
 use rcflib::rcf::{RCFBuilder, RCFOptionsBuilder};
 
@@ -67,7 +66,7 @@ fn impute_different_period() {
             error += next_values
                 .iter()
                 .zip(&data_with_key.data[i])
-                .map(|(x, y)| ((x - y) as f64 * (x - y) as f64))
+                .map(|(x, y)| (x - y) as f64 * (x - y) as f64)
                 .sum::<f64>();
             count += base_dimension;
         }
