@@ -7,12 +7,14 @@ on:
     paths:
       - "**/*.py"
       - "**/*.rs"
+      - ".github/workflows/test.yml"
   pull_request:
     branches:
       - main
     paths:
       - "**/*.py"
       - "**/*.rs"
+      - ".github/workflows/test.yml"
   schedule:
     - cron: "0 0 * * 0"
   workflow_dispatch:
@@ -34,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v8.0.0
       - uses: mozilla-actions/sccache-action@v0.0.9
       - name: Run tests
         run: uvx nox -s test
