@@ -340,10 +340,6 @@ def test_rcf_copy(options: RandomCutForestOptions, copier: Callable[[Any], Any])
 
 
 @pytest.mark.parametrize("parallel", [True, False])
-@pytest.mark.xfail(
-    platform.python_implementation() == "PyPy",
-    reason="pypy",
-)
 def test_rcf_thread_safety_score(parallel: bool):  # noqa: FBT001
     dim = 10
     shingle_size = 4
@@ -357,7 +353,7 @@ def test_rcf_thread_safety_score(parallel: bool):  # noqa: FBT001
     forest = RandomCutForest(options)
 
     rng = np.random.default_rng(42)
-    pp = rng.random((200, dim))
+    pp = rng.random((300, dim))
     scores = []
 
     for point in pp:
@@ -392,7 +388,7 @@ def test_rcf_thread_safety_update():
     forest = RandomCutForest(options)
 
     rng = np.random.default_rng(42)
-    pp = rng.random((200, dim))
+    pp = rng.random((300, dim))
     updates = []
     with ThreadPoolExecutor() as executor:
         for point in pp:
@@ -416,7 +412,7 @@ def test_rcf_thread_safety_score_and_update():
     forest = RandomCutForest(options)
 
     rng = np.random.default_rng(42)
-    pp = rng.random((200, dim))
+    pp = rng.random((300, dim))
     scores = []
     updates = []
     with ThreadPoolExecutor() as executor:
